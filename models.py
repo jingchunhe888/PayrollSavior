@@ -181,7 +181,8 @@ def compare_list_details(list1, sum_minutes, list2, employee):
     hours = parts[0]
     minutes = parts[1]
     parts = int(hours)*60+int(minutes)
-    print(f'the sum minutes = {sum_minutes} and the list2 {list2} and the parts {parts} and the hours = {hours} and the minutes = {minutes}')
+    list1 = f"{list1:.2f}"
+    # print(f'the sum minutes = {sum_minutes} and the list2 {list2} and the parts {parts} and the hours = {hours} and the minutes = {minutes}')
     if sum_minutes != parts:
         print(f"{employee} INCORRECT\nHH:MM value is {list1} but Excel sheet shows {list2}.")
     else:
@@ -238,6 +239,8 @@ def main(file_path):
         # print('good rows df')
         # print(df_work_hours.to_string())
         total_hours, hours_minutes_format, sum_minutes, overtime = get_hours(df_work_hours)
+        total_hours = float(total_hours)
+        total_hours = f"{total_hours:.2f}"
         employee.work_time = total_hours
         employee.hours_minutes_format = hours_minutes_format
         check_computer = employee.hours_minutes_format
@@ -245,9 +248,12 @@ def main(file_path):
         employee.absent_hours = absent
         employee.holiday_hours = holiday
         employee.sick_hours = sick
+        overtime = float(overtime)
+        overtime = f"{overtime:.2f}"
         employee.overtime_hours = overtime
         compare_list_details(check_computer, sum_minutes, check_original[index], employee.name)
-        print(f'File path used: {file_path}')
+        directory, filename = os.path.split(file_path)
+        print(f'File name used: {filename}')
         employee.print_work_hours()
         print('\n')
 
