@@ -1,283 +1,94 @@
-# models.py
+import tkinter as tk
+from tkinter import filedialog, messagebox, scrolledtext
+from models import *
 import pandas as pd
 import re
-from dataformat import *
-import os
-import datetime
 import sys
-import numpy as np
-#
-class Employee:
-    def __init__(self, name, work_time=0, holiday_hours=0, absent_hours=0, sick_hours=0, vacation_hours=0, overtime_hours=0):
-        self.name = name
-        self.work_time = work_time
-        self.holiday_hours = holiday_hours
-        self.absent_hours = absent_hours
-        self.sick_hours = sick_hours
-        self.vacation_hours = vacation_hours
-        self.overtime_hours = overtime_hours
-        self.hours_minutes_format = "0:00"
+import io
 
-    def __str__(self):
-        return (f"\nEmployee(name={self.name}, work_time={self.work_time}, hours_minutes_format={self.hours_minutes_format}, "
-                f"holiday_hours={self.holiday_hours}, absent_hours={self.absent_hours}, sick_hours={self.sick_hours}, "
-                f"vacation_hours={self.vacation_hours}, overtime_hours={self.overtime_hours})")
-
-    def print_work_hours(self):
-        print(f"EMPLOYEE: {self.name}\nTOTAL HOURLY: {self.work_time}\nOVERTIME HOURS:{self.overtime_hours}"
-              f"\nVACATION {self.vacation_hours}\nSICK {self.sick_hours}\nHOLIDAY {self.holiday_hours}\nABSENT {self.absent_hours}")
+from dataformat import *
+# from config import *
 
 
-#to do
-#put names in order
-#check totals
-#use
+class StreamToTkinter:
+    def __init__(self, widget):
+        self.widget = widget
 
-def extract_employee_names(df):
-    employee_names = []
+    def write(self, message):
+        # Append the message to the Tkinter Text widget
+        self.widget.insert('end', message)
+        self.widget.yview('end')  # Scroll to the end of the widget
 
-    for index, row in df.iterrows():
-        # Check if the current row is followed by "TIME IN"
-        if index + 1 < len(df):
-            next_row = df.iloc[index + 1]
-            # print(f'Next row{next_row.iloc[0]}')
-            if pd.notna(next_row.iloc[0]) and isinstance(next_row.iloc[0], str) and next_row.iloc[0].strip().lower() == 'time in':
-                # The current row contains the employee name
-                if pd.notna(row.iloc[0]) and row.iloc[0] != '':
-                    employee_names.append(row.iloc[0])
-
-    return employee_names
-
-def create_employees(employee_names):
-    employees = [Employee(name) for name in employee_names]
-    return employees
+    def flush(self):
+        # This method is needed for file-like objects but can be left empty
+        pass
 
 
-def rows_to_keep(employee_names,df):
-    employees = employee_names
-    repeated_index = [name for name in employees for _ in range(5)]
-    num_rows_to_keep = len(employee_names)*5
-    df = df.iloc[:num_rows_to_keep]
-    df.index = repeated_index
-    # print(df.to_string())
-    return df
+class PayFlex:
 
-def get_employee_df(df,employee_name):
-    filtered_df = df.loc[employee_name]
-    return filtered_df
+    def __init__(self, root):
+        self.file_path = None
+        self.root = root
+        self.root.title("Payroll Savior")
 
-def get_valid_columns(df):
-    subset_df = df.iloc[1:4, :]
-    subset_df = subset_df.iloc[:, 1:14]
-    valid_columns = subset_df.columns[subset_df.notna().all(axis=0)]
-    filtered_df = subset_df[valid_columns]
-    return filtered_df
+        # QB file upload section
+        self.file_label = tk.Label(root, text="Upload Excel Folder:")
+        self.file_label.grid(row=0, column=0, padx=5, pady=5, sticky='e')
 
-def get_hours(df):
-    def convert_to_time(time):
-        time = time.strip()
-        # print('time')
-        # print(time)
+        self.file_label_button = tk.Button(root, text="Upload Excel Folder:", command=self.upload_qb_file)
+        self.file_label_button.grid(row=0, column=1, padx=5, pady=5, sticky='w')
 
-        # Correct regex patterns
-        pattern_hh_mm_ss = r'(\d{1,2}):(\d{2}):(\d{2})'  # Matches HH:MM:SS
-        pattern_hh_mm = r'(\d{1,2}):(\d{2})'  # Matches HH:MM
+        self.file_status = tk.Label(root, text="Current File: None")
+        self.file_status.grid(row=0, column=2, padx=5, pady=5, sticky='w')
 
-        match_3 = re.match(pattern_hh_mm_ss, time)
-        match_2 = re.match(pattern_hh_mm, time)
+        # Summary output
+        self.summary_button = tk.Button(root, text="Summary", command=self.show_summary)
+        self.summary_button.grid(row=5, column=0, padx=5, pady=5, sticky='w')
 
-        if match_3:
-            # print('match HH:MM:SS')
-            hour = int(match_3.group(1))  # Extract the hour
-            minute = int(match_3.group(2))  # Extract the minute
-            second = int(match_3.group(3))  # Extract the second
-            # print(f"Hour: {hour}, Minute: {minute}, Second: {second}")
-            total = float(hour * 60 + minute)
-            # print('total minutes')
-            # print(total)
-            return total
+        self.summary_text = scrolledtext.ScrolledText(root, width=100, height=50)
+        self.summary_text.grid(row=6, column=0, columnspan=3, padx=5, pady=5)
 
-        elif match_2:
-            # print('match HH:MM')
-            hour = int(match_2.group(1))  # Extract the hour
-            minute = int(match_2.group(2))  # Extract the minute
-            total = float(hour * 60 + minute)
-            # print('total minutes')
-            # print(total)
-            return total
-
+    def upload_qb_file(self):
+        file_path = filedialog.askdirectory(title="Select Excel Folder")
+        if file_path:
+            self.file_path = file_path
+            self.file_status.config(text=f"Current File: {file_path}")
         else:
-            # print(f"{time} does not match any known time format.")
-            return None
+            messagebox.showwarning("Warning", "No file selected")
 
-    def check_overtime(week1, week2):
-        max = 40
-        overtime1 = week1-max
-        overtime2 = week2-max
-        if overtime1 > 0 and overtime2 > 0:
-            return overtime1+overtime2
-        if overtime1 > 0:
-            return overtime1
-        if overtime2> 0:
-            return overtime2
-        else:
-            return 0
+    def get_file_path(self):
+        print(self.file_path)
+        return self.file_path
 
+    def show_summary(self):
+        self.summary_text.delete('1.0', tk.END)
 
-    sum_minutes = 0
-    hours_by_week1 = 0
-    hours_by_week2 = 0
-    for column_name, column_data in df.items():
-        week1 = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
-        week2 = ['Mon2', 'Tue2', 'Wed2', 'Thu2', 'Fri2']
-        values = [convert_to_time(str(value)) for value in column_data]
-        start, end, bre = values[0], values[1], values[2]
-        total = end - bre - start
-        if column_name in week1:
-            hours_by_week1 += total
+        # Capture printed output
+        file_path = self.get_file_path()
 
-        if column_name in week2:
-            hours_by_week2 += total
+        # Redirect stdout to capture the print output
+        old_stdout = sys.stdout
+        new_stdout = io.StringIO()
+        sys.stdout = new_stdout
 
-        sum_minutes += total
+        try:
+            models(file_path)
+        finally:
+            # Restore original stdout
+            sys.stdout = old_stdout
 
-    total_hours_by_week1 = hours_by_week1 / 60
-    total_hours_by_week2 = hours_by_week2 / 60
-    overtime = check_overtime(total_hours_by_week1, total_hours_by_week2)
-    total_hours = sum_minutes / 60
-    minutes_format = int(sum_minutes % 60)
-    hours_minutes_format = int(sum_minutes / 60)
-    hours_minutes_format = f'{hours_minutes_format}.{str(minutes_format).zfill(2)}'
-    hours_minutes_format = float(hours_minutes_format)
+        # Get the captured output
+        output = new_stdout.getvalue()
 
-    return total_hours, hours_minutes_format, overtime
-
-# def pattern():
-#     pattern = ["time in", "time out", "break", "total"]
-
-def count_vacation_occurrences(df):
-    count = (df.map(lambda x: isinstance(x, str) and x.lower() == 'vacation')).sum().sum()
-    return count
-
-def count_absent_occurrences(df):
-    count = (df.map(lambda x: isinstance(x, str) and x.lower() == 'absent')).sum().sum()
-    return count
-
-def count_holiday_occurrences(df):
-    count = (df.map(lambda x: isinstance(x, str) and x.lower() == 'holiday')).sum().sum()
-    return count
-def count_sick_occurrences(df):
-    count = (df.map(lambda x: isinstance(x, str) and x.lower() == 'sick')).sum().sum()
-    return count
-
-def check_same(df):
-    non_empty_values = df.iloc[:, 13].dropna().tolist()
-    # print(f'total values found in excel {non_empty_values}')
-    return non_empty_values
-def compare_list_details(list1, list2, employee):
-    if list1 != list2:
-        print(f"{employee} INCORRECT\nHH:MM value is {list1} but Excel sheet shows {list2}.")
-    else:
-        print(f"{employee} CORRECT")
-
-def main(file_path):
-    df = pd.read_excel(file_path)
-    first_column = df.iloc[:, 0]
-    first_column_list = first_column.tolist()
-    first_column_list = nan_none(first_column_list)
-    first_column_list = time_total(first_column_list)
-    df.iloc[:,0]=first_column_list
-    check_original = check_same(df)
-    df = merge_rows(df)
-
-    employee_names = extract_employee_names(df)
-
-    df = rows_to_keep(employee_names, df)
-    employees = create_employees(employee_names)
-
-    for index, employee in enumerate(employees):
-        df_sub = get_employee_df(df, employee.name)
-        vacation_count = count_vacation_occurrences(df_sub)
-        absent = count_absent_occurrences(df_sub)
-        holiday = count_holiday_occurrences(df_sub)
-        sick = count_sick_occurrences(df_sub)
-
-
-        num_columns = df_sub.shape[1]
-        # Define the base column names
-        df_col = ['Row Title', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'NaN', 'Mon2', 'Tue2', 'Wed2', 'Thu2', 'Fri2']
-
-        # Generate the column names dynamically
-        columns = []
-        nan_count = 1
-        base_columns_length = 12
-        for i in range(num_columns):
-            if i < base_columns_length:
-                columns.append(df_col[i])
-            else:
-                columns.append(f'NaN{nan_count}')
-                nan_count += 1
-
-        # Assign the generated column names to the dataframe
-        df_sub.columns = columns
-
-        df_work_hours = get_valid_columns(df_sub)
-        # print('final df')
-        # print(df_work_hours.shape)
-        # print(df_work_hours.to_string())
-        # print('valid df')
-        # print(df_work_hours.to_string())
-
-        # print('good rows df')
-        # print(df_work_hours.to_string())
-        total_hours, hours_minutes_format, overtime = get_hours(df_work_hours)
-        employee.work_time = total_hours
-        employee.hours_minutes_format = hours_minutes_format
-        check_computer = employee.hours_minutes_format
-        employee.vacation_hours = vacation_count
-        employee.absent_hours = absent
-        employee.holiday_hours = holiday
-        employee.sick_hours = sick
-        employee.overtime_hours = overtime
-        compare_list_details(check_computer, check_original[index], employee.name)
-        print(f'File path used: {file_path}')
-        employee.print_work_hours()
-        print('\n')
+        # Insert new summary text
+        if output:
+            self.summary_text.insert(tk.END, output)
 
 
 
 
 
-def models(file_path):
-
-
-    # Define the end date
-    end_date = datetime.datetime(2024, 8, 8)  # Example: 5th August 2024
-
-    # Get the current date
-    current_date = datetime.datetime.now()
-
-    # Check if the current date is past the end date
-    if current_date > end_date:
-        print("This script is no longer allowed to run after the specified date.")
-        return  # Exit the script
-
-    # The rest of your script
-    print("Running script... Deadline to renew is: 8th August 2024")
-
-    if os.path.isfile(file_path):
-        main(file_path)
-    elif os.path.isdir(file_path):
-        for filename in os.listdir(file_path):
-            # Construct full file path
-            full_path = os.path.join(file_path, filename)
-
-            # Check if it's an Excel file and not a hidden file
-            if filename.startswith('.') or not filename.lower().endswith('.xlsx'):
-                continue
-
-            # Call main with the full file path
-            main(full_path)
-#
-# file_path = '/Users/jinhe/Downloads/Payflex'
-# models(file_path)
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = PayFlex(root)
+    root.mainloop()
