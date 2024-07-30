@@ -1,9 +1,10 @@
 # models.py
 import pandas as pd
-from config import *
 import re
 from dataformat import *
 import os
+import datetime
+import sys
 import numpy as np
 #
 class Employee:
@@ -23,8 +24,8 @@ class Employee:
                 f"vacation_hours={self.vacation_hours}, overtime_hours={self.overtime_hours})")
 
     def print_work_hours(self):
-        print(f"Employee: {self.name}\nTotal Hours: {self.work_time} , HH:MM: {self.hours_minutes_format}\nOvertime Hours:{self.overtime_hours}"
-              f"\nVacation {self.vacation_hours}\nSick {self.sick_hours}\nHoliday {self.holiday_hours}\nAbsent {self.absent_hours}")
+        print(f"EMPLOYEE: {self.name}\nTOTAL HOURLY: {self.work_time}\nOVERTIME HOURS:{self.overtime_hours}"
+              f"\nVACATION {self.vacation_hours}\nSICK {self.sick_hours}\nHOLIDAY {self.holiday_hours}\nABSENT {self.absent_hours}")
 
 
 #to do
@@ -171,7 +172,7 @@ def count_sick_occurrences(df):
 
 def check_same(df):
     non_empty_values = df.iloc[:, 13].dropna().tolist()
-    print(f'total values found in excel {non_empty_values}')
+    # print(f'total values found in excel {non_empty_values}')
     return non_empty_values
 def compare_list_details(list1, list2, employee):
     if list1 != list2:
@@ -239,23 +240,44 @@ def main(file_path):
         employee.sick_hours = sick
         employee.overtime_hours = overtime
         compare_list_details(check_computer, check_original[index], employee.name)
+        print(f'File path used: {file_path}')
         employee.print_work_hours()
+        print('\n')
 
 
 
 
 
+def models(file_path):
 
-if os.path.isfile(file_path):
-    main(file_path)
-elif os.path.isdir(file_path):
-    for filename in os.listdir(file_path):
-        # Construct full file path
-        full_path = os.path.join(file_path, filename)
 
-        # Check if it's an Excel file and not a hidden file
-        if filename.startswith('.') or not filename.lower().endswith(('.xls', '.xlsx')):
-            continue
+    # Define the end date
+    end_date = datetime.datetime(2024, 8, 8)  # Example: 5th August 2024
 
-        # Call main with the full file path
-        main(full_path)
+    # Get the current date
+    current_date = datetime.datetime.now()
+
+    # Check if the current date is past the end date
+    if current_date > end_date:
+        print("This script is no longer allowed to run after the specified date.")
+        return  # Exit the script
+
+    # The rest of your script
+    print("Running script... Deadline to renew is: 8th August 2024")
+
+    if os.path.isfile(file_path):
+        main(file_path)
+    elif os.path.isdir(file_path):
+        for filename in os.listdir(file_path):
+            # Construct full file path
+            full_path = os.path.join(file_path, filename)
+
+            # Check if it's an Excel file and not a hidden file
+            if filename.startswith('.') or not filename.lower().endswith('.xlsx'):
+                continue
+
+            # Call main with the full file path
+            main(full_path)
+#
+# file_path = '/Users/jinhe/Downloads/Payflex'
+# models(file_path)
