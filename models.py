@@ -4,7 +4,6 @@ import re
 from dataformat import *
 import os
 import datetime
-from config import *
 from transform import *
 from rewrite import *
 import time
@@ -115,8 +114,8 @@ def get_hours(df):
     hours_by_week1 = 0
     hours_by_week2 = 0
     for column_name, column_data in df.items():
-        week1 = ['MON', 'TUE', 'WED', 'THU', 'FRI','SAT','SUN']
-        week2 = ['MON2', 'TUE2', 'WED2', 'THU2', 'FRI2','SAT2','SUN2']
+        week1 = ['MON', 'TUE', 'TUES', 'WED', 'THU', 'FRI','SAT','SUN']
+        week2 = ['MON2', 'TUE2', 'TUES2', 'WED2', 'THU2', 'FRI2','SAT2','SUN2']
         values = []
         for value in column_data:
             value = convert_to_time(str(value))
@@ -191,7 +190,7 @@ def compare_list_details(list1, sum_minutes, list2, employee,all_correct):
     if isinstance(list2,datetime.timedelta):
         parts = list2.total_seconds()/60
     #it is HH.MM
-    elif isinstance(list2,float or int):
+    elif isinstance(list2,float | int):
         list2 = f"{list2:.2f}"
         parts = list2.split('.')
         hours = parts[0]
@@ -351,6 +350,7 @@ def models(file_path):
                 continue
 
             main(full_path, directory,df)
+    print('Whew! I am done running <3')
 
 def do_your_thing(csv_path):
     rename_all(csv_path)
