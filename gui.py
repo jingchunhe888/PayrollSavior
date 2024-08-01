@@ -29,13 +29,13 @@ class PayFlex:
     def __init__(self, root):
         self.file_path = None
         self.root = root
-        self.root.title("Get-Excel-Data-BLS")
+        self.root.title("Payroll Savior")
 
         # QB file upload section
-        self.file_label = tk.Label(root, text="Upload Excel Folder:")
+        self.file_label = tk.Label(root, text="Upload Folder with all Excel and CSV Files:")
         self.file_label.grid(row=0, column=0, padx=5, pady=5, sticky='e')
 
-        self.file_label_button = tk.Button(root, text="Upload Excel Folder:", command=self.upload_qb_file)
+        self.file_label_button = tk.Button(root, text="Upload", command=self.upload_qb_file)
         self.file_label_button.grid(row=0, column=1, padx=5, pady=5, sticky='w')
 
         self.file_status = tk.Label(root, text="Current File: None")
