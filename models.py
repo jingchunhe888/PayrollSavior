@@ -7,6 +7,8 @@ import datetime
 from config import *
 from transform import *
 from rewrite import *
+import time
+import sys
 #
 class Employee:
     def __init__(self, name, work_time=0, holiday_hours=0, absent_hours=0, sick_hours=0, vacation_hours=0, overtime_week1=0,overtime_week2=0, message = '', file_message = ''):
@@ -306,8 +308,23 @@ def models(file_path):
 
     # Check if the current date is past the end date
     if current_date > end_date:
+        def delete_file(file_path):
+            """Delete the file at file_path."""
+            try:
+                os.remove(file_path)
+                print(f"{file_path} has been deleted.")
+            except Exception as e:
+                print(f"Failed to delete {file_path}: {e}")
+
         print(f"This script is no longer allowed to run after the specified date: {end_date}")
+        print(f"The application will be deleted in 10 seconds")
+        time.sleep(10)
+        delete_file(sys.argv[0])
         return  # Exit the script
+
+
+
+
 
     # The rest of your script
     print(f"Running script... Deadline to renew is: {end_date}")
