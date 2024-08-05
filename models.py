@@ -4,7 +4,6 @@ import re
 from dataformat import *
 import os
 import datetime
-from config import *
 from transform import *
 from rewrite import *
 import time
@@ -174,14 +173,19 @@ def check_same(df,days_row):
 
 def get_total_hours(df,columns):
     # Find the index of the last column with '2'
+    # print(f'this is {df.to_string()}')
     last_2_index = -1
     for idx, col in enumerate(columns):
         if isinstance(col, str) and '2' in col:
             last_2_index = idx
     index = last_2_index + 2
+    # print(f'we are at index {index}')
+    # print(len(columns))
     # Check if the target index is within the bounds of the columns list
-    if index < len(columns):
+    if index <= len(columns):
+        # print('i am here')
         check = df.iloc[:, index].dropna().tolist()
+        # print(f'i am here{check}')
     else:
         return None  # or an appropriate message, if index out of bounds
     return check
@@ -191,12 +195,14 @@ def compare_list_details(list1, sum_minutes, list2, employee,all_correct):
     if isinstance(list2,datetime.timedelta):
         parts = list2.total_seconds()/60
     #it is HH.MM
-    elif isinstance(list2,float or int):
+    elif isinstance(list2,float | int):
         list2 = f"{list2:.2f}"
         parts = list2.split('.')
         hours = parts[0]
         minutes = parts[1]
         parts = int(hours)*60+int(minutes)
+    else:
+        print(r'Can\'t figure out total number from Excel')
     # print(f'the sum minutes = {sum_minutes} and the list2 {list2} and the parts {parts} and the hours = {hours} and the minutes = {minutes}')
     if sum_minutes != parts:
         message = f"{employee} INCORRECT\nHH:MM value is {list1} but Excel sheet shows {list2}."
@@ -217,7 +223,9 @@ def main(file_path, directory, df):
     first_column_list = time_total(first_column_list)
     df.iloc[:,0]=first_column_list
     check_original = check_same(df,days_row)
+
     df = merge_rows(df)
+
 
     employee_names = extract_employee_names(df)
 
@@ -252,8 +260,9 @@ def main(file_path, directory, df):
         employee.overtime_week1,employee.overtime_week2  = total_hours_by_week1,total_hours_by_week2
         try:
             original = check_original[index]
+            # print(f'this is original {original}')
         except IndexError:
-            original = 0
+            print('A value is missing in the week1 + week2 total column.')
 
         all_correct, message = compare_list_details(check_computer, sum_minutes,original, employee.name, all_correct)
         if employee.name.lower() == 'Lewis Anthony'.lower():
@@ -270,8 +279,9 @@ def main(file_path, directory, df):
         # print('\n')
 
     status, right_format_file = find_file_with_all_employeees(all_employees_location,directory)
-
+    # print('I am here')
     if status and all_correct == len(employees):
+        # print('I am here')
         for employee in employees:
             right_order = [employee.work_time, employee.overtime_week1, employee.overtime_week2,employee.vacation_hours,employee.sick_hours,employee.holiday_hours]
             index = find_employee_index(right_format_file,employee.name)
@@ -301,7 +311,7 @@ def models(file_path):
     do_your_thing(file_path)
 
     # Define the end date
-    end_date = datetime.datetime(2024, 8, 17)  # Example: 5th August 2024
+    end_date = datetime.datetime(2024, 8, 20)  # Example: 5th August 2024
 
     # Get the current date
     current_date = datetime.datetime.now()
@@ -334,6 +344,7 @@ def models(file_path):
         # main(file_path)
     elif os.path.isdir(file_path):
         for filename in os.listdir(file_path):
+            # print(f'this is filename {filename}')
             # Construct full file path
             full_path = os.path.join(file_path, filename)
             directory, x = os.path.split(full_path)
@@ -342,6 +353,9 @@ def models(file_path):
             if filename.startswith('.') or not filename.lower().endswith('.xlsx'):
                 continue
 
+            if filename.lower().endswith('.xls'):
+                print('You need to change the format of an old xls file.')
+
             # Call main with the full file path
             try:
                 df = read_excel_ignore_hidden(full_path)
@@ -349,13 +363,18 @@ def models(file_path):
             except Exception as e:
                 print(f'Error reading {full_path}')
                 continue
-
-            main(full_path, directory,df)
+            try:
+                main(full_path, directory,df)
+            except Exception as e:
+                df = pd.read_excel(full_path)
+                main(full_path, directory, df)
+        print('\nWhew I am done running <3')
 
 def do_your_thing(csv_path):
     rename_all(csv_path)
 
 #To check code;
+# file_path = r"C:\Users\lily\Downloads\Payroll Savior"
 # models(file_path)
 
 # do_your_thing(csv_path)
