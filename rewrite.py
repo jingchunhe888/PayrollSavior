@@ -46,6 +46,8 @@ def fill_get_rename(right_format_file, right_order, index):
         data = read_csv(right_format_file)
         start_column = start_column + 1
 
+    return right_order
+
 def move_file(right_format_file):
     directory, filename = os.path.split(right_format_file)
     destination = os.path.join(directory, 'Filled')
@@ -69,8 +71,12 @@ def get_reg_hours(data,row,start_column):
 
 def check_overtime(week1, week2,reg_hours):
     max = reg_hours/2
+    # print(f'week 1 {week1} and week2 {week2}')
+    # print(f'max {max}')
+    # print(f'week 1 type {type(week1)} and week2 type {type(week2)}')
     overtime1 = week1-max
     overtime2 = week2-max
+    # print(f'overtime1 1 {overtime1} and overtime1 {overtime2}')
     if overtime1 > 0 and overtime2 > 0:
         overtime = overtime1+overtime2
         overtime = float(overtime)
@@ -80,7 +86,7 @@ def check_overtime(week1, week2,reg_hours):
         overtime1 = float(overtime1)
         overtime1 = f"{overtime1:.2f}"
         return overtime1
-    if overtime2> 0:
+    if overtime2 > 0:
         overtime2 = float(overtime2)
         overtime2 = f"{overtime2:.2f}"
         return overtime2
