@@ -1,8 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, scrolledtext
 from models import *
-import pandas as pd
-import re
 import sys
 import io
 
@@ -83,9 +81,6 @@ class PayFlex:
         # Insert new summary text
         if output:
             self.summary_text.insert(tk.END, output)
-
-
-
 
 
 if __name__ == "__main__":
