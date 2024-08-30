@@ -7,7 +7,6 @@ import sys
 import io
 
 from dataformat import *
-from config import *
 
 
 class StreamToTkinter:
@@ -42,8 +41,11 @@ class PayFlex:
         self.file_status.grid(row=0, column=2, padx=5, pady=5, sticky='w')
 
         # Summary output
-        self.summary_button = tk.Button(root, text="Summary", command=self.show_summary)
+        self.summary_button = tk.Button(root, text="Summary", command=self.show_override)
         self.summary_button.grid(row=5, column=0, padx=5, pady=5, sticky='w')
+
+        self.summary_button = tk.Button(root, text="Override", command=self.show_summary)
+        self.summary_button.grid(row=5, column=2, padx=5, pady=5, sticky='w')
 
         self.summary_text = scrolledtext.ScrolledText(root, width=100, height=50)
         self.summary_text.grid(row=6, column=0, columnspan=3, padx=5, pady=5)
@@ -72,7 +74,31 @@ class PayFlex:
         sys.stdout = new_stdout
 
         try:
-            models(file_path)
+            models(file_path, False)
+        finally:
+            # Restore original stdout
+            sys.stdout = old_stdout
+
+        # Get the captured output
+        output = new_stdout.getvalue()
+
+        # Insert new summary text
+        if output:
+            self.summary_text.insert(tk.END, output)
+
+    def show_override(self):
+        self.summary_text.delete('1.0', tk.END)
+
+        # Capture printed output
+        file_path = self.get_file_path()
+
+        # Redirect stdout to capture the print output
+        old_stdout = sys.stdout
+        new_stdout = io.StringIO()
+        sys.stdout = new_stdout
+
+        try:
+            models(file_path, True)
         finally:
             # Restore original stdout
             sys.stdout = old_stdout
