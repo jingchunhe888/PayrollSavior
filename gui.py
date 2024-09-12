@@ -3,9 +3,7 @@ from tkinter import filedialog, messagebox, scrolledtext
 from models import *
 import sys
 import io
-
 from dataformat import *
-from config import *
 
 
 class StreamToTkinter:
