@@ -28,7 +28,7 @@ def delete_temp_dir(temp_dir="temp"):
 
 # Main function for the Streamlit app
 def main():
-    st.title("Payroll Savior 1.2 SHOUTOUT TO JOEY")
+    st.title("Payroll Savior 1.2")
 
     # Upload multiple files
     uploaded_files = st.file_uploader(
