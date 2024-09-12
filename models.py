@@ -4,7 +4,6 @@ import re
 from dataformat import *
 import os
 import datetime
-from config import *
 from transform import *
 from rewrite import *
 import time
