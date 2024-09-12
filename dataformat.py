@@ -3,7 +3,6 @@ import numpy as np
 from openpyxl import load_workbook
 
 
-
 def time_total(data):
     # Define the pattern and replacement rules
     pattern = ['time in', 'time out', 'break', 'total']
