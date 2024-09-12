@@ -28,11 +28,11 @@ def delete_temp_dir(temp_dir="temp"):
 
 # Main function for the Streamlit app
 def main():
-    st.title("Payroll Savior")
+    st.title("Payroll Savior 1.2")
 
     # Upload multiple files
     uploaded_files = st.file_uploader(
-        "Upload Excel and CSV Files:",
+        "Upload BLS Excel and Goldfine Timesheet CSV Files:",
         type=["csv", "xlsx"],
         accept_multiple_files=True
     )
