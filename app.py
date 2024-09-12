@@ -3,7 +3,6 @@ from models import *
 import io
 import zipfile
 from dataformat import *
-from config import *
 
 
 def save_uploaded_files(
