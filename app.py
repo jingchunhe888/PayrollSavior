@@ -1,74 +1,86 @@
 import streamlit as st
-from models import *
 import io
+import os
 import zipfile
+import shutil
+from models import *
 from dataformat import *
+from config import *
+import sys
 
-
-def save_uploaded_files(
-        uploaded_files: list[st.runtime.uploaded_file_manager.UploadedFile], 
-        temp_dir: str = "temp"
-    ) -> None:
+# Function to save uploaded files to a temporary directory
+def save_uploaded_files(uploaded_files, temp_dir="temp"):
     if not os.path.exists(temp_dir):
         os.makedirs(temp_dir)
-
+    
     file_paths = []
     for uploaded_file in uploaded_files:
         file_path = os.path.join(temp_dir, uploaded_file.name)
         with open(file_path, "wb") as f:
-            f.write(uploaded_file.getvalue())
+            f.write(uploaded_file.getvalue())  # Save each file's contents
         file_paths.append(file_path)
+    return file_paths
 
-
-def delete_temp_dir(temp_dir: str = "temp") -> None:
+# Function to delete the temp directory
+def delete_temp_dir(temp_dir="temp"):
     if os.path.exists(temp_dir):
         shutil.rmtree(temp_dir)
 
-
+# Main function for the Streamlit app
 def main():
     st.title("Payroll Savior")
 
+    # Upload multiple files
     uploaded_files = st.file_uploader(
         "Upload Excel and CSV Files:",
         type=["csv", "xlsx"],
         accept_multiple_files=True
     )
 
-    st.session_state.uploaded_files = uploaded_files
-    st.write(f"Uploaded {len(uploaded_files)} files")
+    if uploaded_files:
+        st.write(f"Uploaded {len(uploaded_files)} files")
 
-    if st.button("Summary") and 'uploaded_files' in st.session_state:
-        old_stdout = sys.stdout
-        new_stdout = io.StringIO()
-        sys.stdout = new_stdout
+        # Create a summary and process the files when the button is clicked
+        if st.button("Summary"):
+            old_stdout = sys.stdout
+            new_stdout = io.StringIO()
+            sys.stdout = new_stdout
 
-        try:
-            save_uploaded_files(uploaded_files)
-            models('temp')
+            try:
+                # Save uploaded files to the temp directory
+                file_paths = save_uploaded_files(uploaded_files)
+
+                # Process the files using the models function (adjust to your logic)
+                models('temp')  # Assumes this function processes files in the 'temp' directory
+                
+                # After processing, delete the temp directory (commented out for now)
+                # delete_temp_dir()  # Avoid deleting temp too early
+            finally:
+                sys.stdout = old_stdout
+
+            if new_stdout.getvalue():
+                st.text_area("Summary", new_stdout.getvalue(), height=400)
+
+            # Create a ZIP file with the processed files
+            zip_buffer = io.BytesIO()
+            with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
+                for root, _, files in os.walk('temp'):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        zipf.write(file_path, os.path.relpath(file_path, start='temp'))
+
+            zip_buffer.seek(0)
+
+            # Provide a download button for the ZIP file
+            st.download_button(
+                label="Download Filled Files",
+                data=zip_buffer,
+                file_name="results.zip",
+                mime="application/zip"
+            )
+
+            # Optionally delete temp directory after download
             delete_temp_dir()
-        finally:
-            sys.stdout = old_stdout
-
-        if new_stdout:
-            st.text_area("Summary", new_stdout.getvalue(), height=400)
-
-        zip_buffer = io.BytesIO()
-        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
-            for root, _, files in os.walk('temp'):
-                for file in files:
-                    file_path = os.path.join(root, file)
-                    name = os.path.relpath(file_path, start='temp')
-                    zipf.write(file_path, name)
-
-        zip_buffer.seek(0)
-            
-        st.download_button(
-            label="Download ZIP",
-            data=zip_buffer,
-            file_name="results.zip",
-            mime="application/zip"
-        )
-
 
 if __name__ == "__main__":
     main()
