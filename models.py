@@ -410,7 +410,6 @@ def main(file_path, directory, df):
 
 
 def models(file_path):
-    print('I am running')
     do_your_thing(file_path)
 
     # Define the end date
