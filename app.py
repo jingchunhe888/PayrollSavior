@@ -29,7 +29,10 @@ def delete_temp_dir(temp_dir="temp"):
 # Main function for the Streamlit app
 def main():
     st.title("Payroll Savior 1.3")
-    st.markdown("Release Notes:  1. Checks whether Goldfine Timesheets has more employees than BLS Excel.  2. 'To Review' download folder for in-out-in-out formats.")
+    
+    st.markdown('''Release Notes:  
+    1. Checks whether Goldfine Timesheets has more employees than BLS Excel.  
+    2. 'To Review' download folder for in-out-in-out formats.''')
 
     # Upload multiple files
     uploaded_files = st.file_uploader(
