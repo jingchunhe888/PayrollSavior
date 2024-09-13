@@ -6,7 +6,6 @@ import openpyxl
 import csv
 from fuzzywuzzy import process
 
-
 # def fill(right_format_file, right_order):
 #     def read_csv(file_path):
 #         with open(file_path, mode='r', newline='', encoding='utf-8') as file:
@@ -46,7 +45,7 @@ def find_employee_index(right_format_file,employee):
     if best_score > 0:  # Adjust the threshold score as needed
         # Find the index of the best match
         best_index = employees_from_csv_list.index(best_match)
-        return best_index
+        return len(employees_from_csv_list)-1,best_index
 
 def get_employees_from_csv(full_path):
     non_empty_values = []
@@ -62,6 +61,7 @@ def get_employees_from_csv(full_path):
                     value = row[1].strip()  # Read the second column (index 1)
                     if value:  # Check if the value is not empty
                         non_empty_values.append(value)
+                        # print(non_empty_values)
 
     except UnicodeDecodeError:
         try:
@@ -95,14 +95,18 @@ def find_file_with_all_employeees(employees,csv_path):
             # print(f'this is the full path {full_path}')
             employees_from_csv_list = get_employees_from_csv(full_path)
             # print(f'this is employees from csv {employees_from_csv_list}')
+
             use_file = check_employees_in_list(employees_from_csv_list,employees)
             if use_file:
                 # print(f'this is the right file to use: {full_path}')
                 # print(f'these are all the employees{employees}')
-                return True, full_path
+                if len(employees_from_csv_list)-1 != len(employees):
+                    message = 'There is one or more extra employees in Goldfine Timesheet'
+                    return False, message
+                else: 
+                    return True, full_path
             else:
-                pass
-            message = 'No file with all the employees was found'
+                message = 'No file with all the employees was found'
         return False, message
     else:
         return False, f'The path {csv_path} is not a directory'
@@ -144,3 +148,129 @@ def check_employees_in_list(employee_to_csv_list, employees):
                 # print(f'Employee "{employee}" is missing.')
                 return False
     return True
+    #
+    # # Check each employee in the list
+    # for employee in employees:
+    #
+    #     value = True
+    #     # Normalize the employee name and split multi-word names
+    #     words = employee.lower().split()
+    #     all_words_found = all(word in employee_csv for word in words)
+    #     return all_words_found
+        #
+        # # Check if it's a multi-word name
+        # if len(words) > 1:
+        #     # Check if any of the words are found in the list
+        #     if any(word in ' '.join(employee_csv) for word in words):
+        #         continue
+        #     else:
+        #         print(f'STOP LOOP: Cannot find any words of "{employee}"')
+        #         print(f'this is employee list: {employees_from_csv_list}, and file {full_path}')
+        #         value = False
+        #         break
+        # else:
+        #     # Check if the single-word name is found in the list
+        #     if any(word in employee_csv for word in words):
+        #         continue
+        #     else:
+        #         print(f'STOP: Cannot find "{employee}"')
+        #         value = False
+        #         break
+    # if not value:
+    #     return False
+    #
+    # return True
+
+
+
+
+
+
+
+
+#
+# def extract_from_filename(filename):
+#     # Extract the part before the first underscore
+#     base_name = os.path.basename(filename)
+#     part = base_name.split('_')[0]
+#     # Remove hyphens
+#     part = part.replace('-', '')
+#     print(f'this is part {part}')
+#     return part.upper()
+#
+
+#
+#
+# def main(goldfine_path):
+#     df = pd.read_csv(goldfine_path,sep='\t')
+#     print(f"Contents of")
+#     print(df.to_string())
+#     # cell = 'A1'
+#     # new_value = 'New Value'
+#     # change_cell_value(goldfine_path, cell, new_value)
+#     def convert_csv_to_excel(csv_path, excel_path):
+#         df = pd.read_csv(csv_path)
+#         df.to_excel(excel_path, index=False)
+#
+#     def change_cell_value(excel_path, cell, new_value):
+#         wb = openpyxl.load_workbook(excel_path)
+#         ws = wb.active
+#
+#         # Change the cell value
+#         ws[cell] = new_value
+#
+#         wb.save(excel_path)
+#
+#     def convert_excel_to_csv(excel_path, csv_path):
+#         df = pd.read_excel(excel_path)
+#         df.to_csv(csv_path, index=False)
+#
+#     # Define the paths
+#     csv_path = '/Users/jinhe/Downloads/SPAINCHI- Timesheet.csv'
+#     excel_path = '/Users/jinhe/Downloads/SPAINCHI- EXCEL Timesheet.xlsx'
+#     cell = 'A1'
+#     new_value = 'New Value'
+#
+#     # Convert CSV to Excel
+#     # convert_csv_to_excel(csv_path, excel_path)
+#
+#     # Change the cell value in the Excel file
+#     change_cell_value(excel_path, cell, new_value)
+#
+#     # Convert Excel back to CSV
+#     # convert_excel_to_csv(excel_path, csv_path)
+#
+#     print(f"Changed cell {cell} to '{new_value}' in {csv_path}")
+#
+#
+# def change_cell_value(csv_path, cell, new_value):
+#     # Read the CSV file into a DataFrame
+#     df = pd.read_csv(csv_path)
+#
+#     # Extract the row and column from the cell reference
+#     col = cell[0].upper()
+#     row = int(cell[1:]) - 1
+#
+#     # Change the value of the specified cell
+#     df.iloc[row, df.columns.get_loc(col)] = new_value
+#
+#     # Save the DataFrame back to the CSV file
+#     df.to_csv(csv_path, index=False)
+#     print(f"Changed cell {cell} to '{new_value}' in {csv_path}")
+#
+# if os.path.isfile(goldfine_path):
+#     main(goldfine_path)
+#
+# elif os.path.isdir(goldfine_path):
+#     for filename in os.listdir(goldfine_path):
+#         # Skip hidden system files
+#         if filename.startswith('.'):
+#             continue
+#
+#         # Construct full file path
+#         full_path = os.path.join(goldfine_path, filename)
+#         if os.path.isfile(full_path) and filename.endswith('.csv'):
+#             main(full_path)
+# else:
+#     print("The provided path does not exist.")
+#
