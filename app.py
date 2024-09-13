@@ -28,7 +28,7 @@ def delete_temp_dir(temp_dir="temp"):
 
 # Main function for the Streamlit app
 def main():
-    st.title("Payroll Savior 1.2")
+    st.title("Payroll Savior 1.3")
 
     # Upload multiple files
     uploaded_files = st.file_uploader(
@@ -75,7 +75,7 @@ def main():
             st.download_button(
                 label="Download Filled Files",
                 data=zip_buffer,
-                file_name="results.zip",
+                file_name="BLS Payroll Results.zip",
                 mime="application/zip"
             )
 
