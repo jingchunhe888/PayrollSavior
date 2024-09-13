@@ -1,9 +1,12 @@
 # models.py
+#version 1.3
+#added review folder and error messages
 import pandas as pd
 import re
 from dataformat import *
 import os
 import datetime
+from config import *
 from transform import *
 from rewrite import *
 import time
@@ -200,6 +203,7 @@ def compare_list_details(list1, sum_minutes, list2, employee,all_correct):
         minutes = parts[1]
         parts = int(hours)*60+int(minutes)
     else:
+        #HARD PRINT but nothing should be printed
         print(r'I can\'t figure out the week1+week2 total from Excel')
     # print(f'the sum minutes = {sum_minutes} and the list2 {list2} and the parts {parts} and the hours = {hours} and the minutes = {minutes}')
     if sum_minutes != parts:
@@ -215,20 +219,60 @@ def compare_list_details(list1, sum_minutes, list2, employee,all_correct):
         all_correct = all_correct + 1
     return all_correct,message
 
-def main(file_path, directory, df):
+def error_check(file_path, directory, df):
     days_row = df.iloc[0]
+    # print(days_row)
     days_row = days_row.tolist()
+
+    #make sure that the workdays have MON and MON2 
     days_row = set_workdays(days_row)
+
     df.iloc[0] = days_row
+
+    #prints the first_columnm, the employee names, time in time out
     first_column = df.iloc[:, 0]
+    # print(first_column)
     first_column_list = first_column.tolist()
+    # print(first_column_list)
     first_column_list = nan_none(first_column_list)
     first_column_list = time_total(first_column_list)
+    # print(first_column_list)
     df.iloc[:,0]=first_column_list
     check_original = check_same(df,days_row)
     df = merge_rows(df)
+    employee_names = extract_employee_names(df)
+    #HARD PRINT
+    if len(check_original) != len(employee_names):
+        filename = os.path.basename(file_path)
+        print(f'{filename} is missing values in the WEEK1 + WEEK2 Total column')
+    return len(check_original)==len(employee_names)
+
+def main(file_path, directory, df):
+    #takes the first row of the dataframe where the dates and weekdays are
+    days_row = df.iloc[0]
+    # print(days_row)
+    days_row = days_row.tolist()
+
+    #make sure that the workdays have MON and MON2 
+    days_row = set_workdays(days_row)
+
+    df.iloc[0] = days_row
+
+    #prints the first_columnm, the employee names, time in time out
+    first_column = df.iloc[:, 0]
+    # print(first_column)
+    first_column_list = first_column.tolist()
+    # print(first_column_list)
+    first_column_list = nan_none(first_column_list)
+    first_column_list = time_total(first_column_list)
+    # print(first_column_list)
+    df.iloc[:,0]=first_column_list
+    check_original = check_same(df,days_row)
+    # print(check_original)
+    df = merge_rows(df)
 
     employee_names = extract_employee_names(df)
+    # print(len(employee_names))
 
     df = rows_to_keep(employee_names, df)
     employees = create_employees(employee_names)
@@ -263,6 +307,7 @@ def main(file_path, directory, df):
         try:
             original = check_original[index]
         except IndexError:
+            #HARD PRINT but nothing should be printed
             original = 0
             print('A value is missing in the week1+week2 total column.')
 
@@ -287,65 +332,106 @@ def main(file_path, directory, df):
             #TEST
             # pass
             right_order = [employee.work_time, employee.overtime_week1, employee.overtime_week2,employee.vacation_hours,employee.sick_hours,employee.holiday_hours]
-            index = find_employee_index(right_format_file,employee.name)
+            len_csv_employees, index = find_employee_index(right_format_file,employee.name)
+            if len_csv_employees == len(employees):
+                # print(f'the index is {index}')
+                fill_get_rename(right_format_file, right_order, index)
+            # else: 
+            #     right_format_file = 'Goldfine Timesheet has an extra employee'
+        if len_csv_employees == len(employees):
+            move_file(right_format_file)
+            move_file(file_path)
 
-            fill_get_rename(right_format_file, right_order, index)
-        move_file(right_format_file)
-        move_file(file_path)
+    #counting if '-' values are there twice, otherwise can fill everything that is correct but not '-'
+
+    
+    count_dash = 0
+    has_neg = False
+    for employee in employees: 
+        if '-' in employee.message:
+            count_dash += 1
+            has_neg = True
+    if status and all_correct+count_dash == len(employees) and has_neg == True:
+        for employee in employees:
+            #TEST
+            # pass
+            right_order = [employee.work_time, employee.overtime_week1, employee.overtime_week2,employee.vacation_hours,employee.sick_hours,employee.holiday_hours]
+            len_csv_employees, index = find_employee_index(right_format_file,employee.name)
+            if len_csv_employees == len(employees):
+                # print(f'the index is {index}')
+                fill_get_rename(right_format_file, right_order, index)
+            # else: 
+            #     right_format_file = 'Goldfine Timesheet has an extra employee'
+        if len_csv_employees == len(employees):
+            move_file_check(right_format_file)
+            move_file_check(file_path)
+    
+
+    #this is where I am printing the errors
     else:
         for employee in employees:
             employee.file_message = right_format_file
             directory, filename = os.path.split(file_path)
-            if employee.file_message == 'No file with all the employees was found':
-                #hard print
+            if 'There is one or more' in employee.file_message or 'No file with all' in employee.file_message:
+                #HARD PRINT
+                # print('this is where I am')
+                
                 print(f'File name used: {filename}')
+                # print('employee file message below')
+                # print('this is where I am')
                 print(employee.file_message)
                 print('\n')
                 break
-            elif '-' in (employee.message):
-                print('One or more of these employees has in-out-in-out format week1+week2 total hours on Excel: \n')
-                for employee in employees:
-                    right_order = [employee.work_time, employee.overtime_week1, employee.overtime_week2,
-                                   employee.vacation_hours, employee.sick_hours, employee.holiday_hours]
-                    index = find_employee_index(right_format_file, employee.name)
-                    overtime_right_order = fill_get_rename(right_format_file, right_order, index)
-                    # hard print
-                    print(f'\nFile name used: {filename}')
-                    print(employee.message)
-                    employee.work_time, employee.overtime_week1, employee.vacation_hours= overtime_right_order[0], overtime_right_order[1], overtime_right_order[2]
-                    employee.sick_hours, employee.holiday_hours = overtime_right_order[2], overtime_right_order[3]
-                    employee.print_work_hours()
+            # elif '-' in (employee.message):
+            #     # print(f'this is the employee message {employee.message}')
+            #     # print(f'this is the end of the employee message')
+            #     # print('One or more of these employees has in-out-in-out format week1+week2 total hours on Excel: \n')
+            #     for employee in employees:
+            #         right_order = [employee.work_time, employee.overtime_week1, employee.overtime_week2,
+            #                        employee.vacation_hours, employee.sick_hours, employee.holiday_hours]
+            #         ignore, index = find_employee_index(right_format_file, employee.name)
+            #         overtime_right_order = fill_get_rename(right_format_file, right_order, index)
+            #         # hard print
+            #         print(f'\nFile name used: {filename}')
+            #         print(employee.message)
+            #         employee.work_time, employee.overtime_week1, employee.vacation_hours= overtime_right_order[0], overtime_right_order[1], overtime_right_order[2]
+            #         employee.sick_hours, employee.holiday_hours = overtime_right_order[2], overtime_right_order[3]
+            #         employee.print_work_hours()
             elif 'INCORRECT' in (employee.message):
+                if '-' in (employee.message):
+                    pass
                 # hard print
-                print(f'File name used: {filename}')
-                print(employee.message)
+                else: 
+                    print(f'File name used: {filename}')
+                    print(employee.message)
 
 
-                break
+                
 
 
 def models(file_path):
+    print('I am running')
     do_your_thing(file_path)
 
     # Define the end date
-    end_date = datetime.datetime(2026, 12, 20)  # Example: 5th August 2024
+    end_date = datetime.datetime(2025, 1, 1)  # Example: 5th August 2024
 
     # Get the current date
     current_date = datetime.datetime.now()
 
     # Check if the current date is past the end date
     if current_date > end_date:
-        def delete_file(file_path):
-            """Delete the file at file_path."""
-            try:
-                os.remove(file_path)
-                #HARD PRINT
-                print(f"{file_path} has been deleted.")
-            except Exception as e:
-                #HARD PRINT
-                print(f"Failed to delete {file_path}: {e}")
+        # def delete_file(file_path):
+        #     """Delete the file at file_path."""
+        #     try:
+        #         os.remove(file_path)
+        #         #HARD PRINT
+        #         # print(f"{file_path} has been deleted.")
+        #     except Exception as e:
+        #         #HARD PRINT
+                # print(f"Failed to delete {file_path}: {e}")
         #HARD PRINT
-        # print(f"This script is no longer allowed to run after the specified date: {end_date}")
+        print(f"This script is no longer allowed to run after the specified date: {end_date}")
         # print(f"The application will be deleted in 10 seconds")
         # time.sleep(10)
         # delete_file(sys.argv[0])
@@ -353,19 +439,52 @@ def models(file_path):
 
     # The rest of your script
     # HARD PRINT
-    print(f"Running script... Deadline to renew is: {end_date}")
+    print(f"Running script... Deadline to renew is: {end_date}\n")
 
     if os.path.isfile(file_path):
         pass
         # main(file_path)
     elif os.path.isdir(file_path):
+        error_occured = False
         for filename in os.listdir(file_path):
             # Construct full file path
             full_path = os.path.join(file_path, filename)
             directory, x = os.path.split(full_path)
 
             if filename.lower().endswith('.xls'):
+                #HARD PRINT
                 print('You need to change the format of a file from xls to xlsx.\n')
+                return
+            # Check if it's an Excel file and not a hidden file
+            if filename.startswith('.') or not filename.lower().endswith('.xlsx'):
+                continue
+
+            # Call main with the full file path
+            try:
+                df = read_excel_ignore_hidden(full_path)
+
+            except Exception as e:
+                #HARD PRINT
+                print(f'\nI could not read this file: {full_path}\n')
+                continue
+
+            try:
+                check_passed = error_check(full_path, directory,df)
+                if check_passed == False:
+                    error_occured = True
+
+            except Exception as e:
+                df = pd.read_excel(full_path)
+                check_passed = error_check(full_path, directory,df)
+                if check_passed == False:
+                    error_occured = True
+        if error_occured: 
+            return
+        for filename in os.listdir(file_path):
+             # Construct full file path
+            full_path = os.path.join(file_path, filename)
+            directory, x = os.path.split(full_path)
+
             # Check if it's an Excel file and not a hidden file
             if filename.startswith('.') or not filename.lower().endswith('.xlsx'):
                 continue
@@ -383,15 +502,16 @@ def models(file_path):
                 main(full_path, directory,df)
             except Exception as e:
                 df = pd.read_excel(full_path)
-                main(full_path, directory, df)
-
-        print('Whew I am done running <33')
+                main(full_path, directory,df)
+        #HARD PRINT
+        print('Whew I am done running <3')
 
 
 def do_your_thing(csv_path):
     rename_all(csv_path)
 
 #To check code;
-# models(file_path)
+file_path = '/Users/jinhe/Downloads/Test'
+models(file_path)
 
 # do_your_thing(csv_path)
