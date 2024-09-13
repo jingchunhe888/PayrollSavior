@@ -25,6 +25,7 @@ def write_csv(file_path, data):
         writer.writerows(data)
 
 def fill_get_rename(right_format_file, right_order, index):
+    # print(f'the index is {index}')
     data = read_csv(right_format_file)
     row = 10 + index
     start_column = 5
@@ -51,6 +52,20 @@ def fill_get_rename(right_format_file, right_order, index):
 def move_file(right_format_file):
     directory, filename = os.path.split(right_format_file)
     destination = os.path.join(directory, 'Filled')
+    # Construct the full destination path for the file
+
+    # Move the file
+
+# Create the destination directory if it doesn't exist
+    if not os.path.exists(destination):
+        os.makedirs(destination)
+# Move the file
+    shutil.move(right_format_file, destination)
+    # print(f'File moved to {dest}')
+
+def move_file_check(right_format_file):
+    directory, filename = os.path.split(right_format_file)
+    destination = os.path.join(directory, 'To Review')
     # Construct the full destination path for the file
 
     # Move the file
