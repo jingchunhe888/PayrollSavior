@@ -32,15 +32,19 @@ def main():
     
     st.markdown('''v1.3 Release Notes:  
     1. Checks whether Goldfine Timesheets has more employees than BLS Excel.  
-    2. 'To Review' download folder for in-out-in-out formats.''')
+    2. 'To Review' download folder for in-out-in-out formats.
+    
+    **[User Guide](https://docs.google.com/document/d/1QMZrcSBi4Cax1r3_MLoRC-QLfkkZThgMhR2kpejT_5U/edit?usp=sharing)**''')
+
+
 
     with st.expander("View All Previous Release Notes"):
         st.markdown('''  
-        **v1.2 Release Notes:**  
+        **v1.2:**  
         1. Supports Saturdays.  
         2. Supports hidden columns.  
         
-        **v1.1 Release Notes:**  
+        **v1.1:**  
         1. Handles wrong weekday headings for overtime computation.
         ''')
 
