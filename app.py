@@ -30,9 +30,19 @@ def delete_temp_dir(temp_dir="temp"):
 def main():
     st.title("Payroll Savior 1.3")
     
-    st.markdown('''Release Notes:  
+    st.markdown('''v1.3 Release Notes:  
     1. Checks whether Goldfine Timesheets has more employees than BLS Excel.  
     2. 'To Review' download folder for in-out-in-out formats.''')
+
+    with st.expander("View All Previous Release Notes"):
+        st.markdown('''  
+        **v1.2 Release Notes:**  
+        1. Supports Saturdays.  
+        2. Supports hidden columns.  
+        
+        **v1.1 Release Notes:**  
+        1. Handles wrong weekday headings for overtime computation.
+        ''')
 
     # Upload multiple files
     uploaded_files = st.file_uploader(
