@@ -32,9 +32,9 @@ def main():
     
     st.markdown('''v1.3 Release Notes:  
     1. Checks whether Goldfine Timesheets has more employees than BLS Excel.  
-    2. 'To Review' download folder for in-out-in-out formats.
+    2. 'To Review' download folder for in-out-in-out formats.''')
     
-    [View User Guide](https://docs.google.com/document/d/1QMZrcSBi4Cax1r3_MLoRC-QLfkkZThgMhR2kpejT_5U/edit?usp=sharing)''')
+    st.write("[View User Guide](https://docs.google.com/document/d/1QMZrcSBi4Cax1r3_MLoRC-QLfkkZThgMhR2kpejT_5U/edit?usp=sharing)")
 
 
 
