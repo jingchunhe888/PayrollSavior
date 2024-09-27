@@ -28,11 +28,11 @@ def delete_temp_dir(temp_dir="temp"):
 
 # Main function for the Streamlit app
 def main():
-    st.title("Payroll Savior 1.3")
+    st.title("Payroll Savior 1.4")
     
-    st.markdown('''v1.3 Release Notes:  
-    1. Checks whether Goldfine Timesheets has more employees than BLS Excel.  
-    2. 'To Review' download folder for in-out-in-out formats.''')
+    st.markdown('''v1.4 Release Notes:  
+    1. Organized printing 
+    2. 'To Review' download folder for in-out-in-out formats AND if there is an extra employee in Goldfine Timesheet.''')
     
     st.write("[View User Guide](https://docs.google.com/document/d/1QMZrcSBi4Cax1r3_MLoRC-QLfkkZThgMhR2kpejT_5U/edit?usp=sharing)")
 
@@ -40,6 +40,10 @@ def main():
 
     with st.expander("View All Previous Release Notes"):
         st.markdown('''  
+        **v1.3**
+        1. Checks whether Goldfine Timesheets has more employees than BLS Excel.  
+        2. 'To Review' download folder for in-out-in-out formats.''')
+        
         **v1.2:**  
         1. Supports Saturdays.  
         2. Supports hidden columns.  
