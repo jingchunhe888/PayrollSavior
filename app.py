@@ -31,7 +31,7 @@ def main():
     st.title("Payroll Savior 1.4")
     
     st.markdown('''v1.4 Release Notes:  
-    1. Organized printing 
+    1. Organized output box for each file.
     2. 'To Review' download folder for in-out-in-out formats AND if there is an extra employee in Goldfine Timesheet.''')
     
     st.write("[View User Guide](https://docs.google.com/document/d/1QMZrcSBi4Cax1r3_MLoRC-QLfkkZThgMhR2kpejT_5U/edit?usp=sharing)")
@@ -42,7 +42,7 @@ def main():
         st.markdown('''  
         **v1.3**
         1. Checks whether Goldfine Timesheets has more employees than BLS Excel.  
-        2. 'To Review' download folder for in-out-in-out formats.)
+        2. 'To Review' download folder for in-out-in-out formats.
         
         **v1.2:**  
         1. Supports Saturdays.  
