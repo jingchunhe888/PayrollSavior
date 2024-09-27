@@ -42,7 +42,7 @@ def main():
         st.markdown('''  
         **v1.3**
         1. Checks whether Goldfine Timesheets has more employees than BLS Excel.  
-        2. 'To Review' download folder for in-out-in-out formats.''')
+        2. 'To Review' download folder for in-out-in-out formats.)
         
         **v1.2:**  
         1. Supports Saturdays.  
