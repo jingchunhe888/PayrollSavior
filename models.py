@@ -395,7 +395,7 @@ def main(file_path, directory, df):
                     print_dict[filename].append("A value is missing in the week1+week2 total column.")
                     # print(f'\nFile name used: {filename}')
                     # print("A value is missing in the week1+week2 total column.")
-                    pass
+                    break
 
                 else: 
 
