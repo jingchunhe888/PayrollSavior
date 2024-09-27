@@ -208,11 +208,11 @@ def compare_list_details(list1, sum_minutes, list2, employee,all_correct):
     # print(f'the sum minutes = {sum_minutes} and the list2 {list2} and the parts {parts} and the hours = {hours} and the minutes = {minutes}')
     if sum_minutes != parts:
         if isinstance(list2, datetime.timedelta):
-            message = f"{employee} INCORRECT\nHH:MM value is {list1} but Excel sheet shows {parts}."
+            message = f"{employee} INCORRECT\nHH:MM value is {list1} but Excel sheet shows {parts}.\n"
         elif isinstance(list2, int | float):
-            message = f"{employee} INCORRECT\nHH:MM value is {list1} but Excel sheet shows {list2}."
+            message = f"{employee} INCORRECT\nHH:MM value is {list1} but Excel sheet shows {list2}.\n"
         else:
-            message = f"{employee} INCORRECT\nHH:MM value is {list1} but Excel sheet shows {list2}."
+            message = f"{employee} INCORRECT\nHH:MM value is {list1} but Excel sheet shows {list2}.\n"
         # print(f"{employee} INCORRECT\nHH:MM value is {list1} but Excel sheet shows {list2}.")
     else:
         message = f"{employee} CORRECT"
@@ -220,34 +220,36 @@ def compare_list_details(list1, sum_minutes, list2, employee,all_correct):
     return all_correct,message
 
 def error_check(file_path, directory, df):
-    days_row = df.iloc[0]
-    # print(days_row)
-    days_row = days_row.tolist()
+    return True
+    # days_row = df.iloc[0]
+    # # print(days_row)
+    # days_row = days_row.tolist()
 
-    #make sure that the workdays have MON and MON2 
-    days_row = set_workdays(days_row)
+    # #make sure that the workdays have MON and MON2 
+    # days_row = set_workdays(days_row)
 
-    df.iloc[0] = days_row
+    # df.iloc[0] = days_row
 
-    #prints the first_columnm, the employee names, time in time out
-    first_column = df.iloc[:, 0]
-    # print(first_column)
-    first_column_list = first_column.tolist()
-    # print(first_column_list)
-    first_column_list = nan_none(first_column_list)
-    first_column_list = time_total(first_column_list)
-    # print(first_column_list)
-    df.iloc[:,0]=first_column_list
-    check_original = check_same(df,days_row)
-    df = merge_rows(df)
-    employee_names = extract_employee_names(df)
-    #HARD PRINT
-    if len(check_original) != len(employee_names):
-        filename = os.path.basename(file_path)
-        print(f'{filename} is missing values in the WEEK1 + WEEK2 Total column')
-    return len(check_original)==len(employee_names)
+    # #prints the first_columnm, the employee names, time in time out
+    # first_column = df.iloc[:, 0]
+    # # print(first_column)
+    # first_column_list = first_column.tolist()
+    # # print(first_column_list)
+    # first_column_list = nan_none(first_column_list)
+    # first_column_list = time_total(first_column_list)
+    # # print(first_column_list)
+    # df.iloc[:,0]=first_column_list
+    # check_original = check_same(df,days_row)
+    # df = merge_rows(df)
+    # employee_names = extract_employee_names(df)
+    # #HARD PRINT
+    # if len(check_original) != len(employee_names):
+    #     filename = os.path.basename(file_path)
+    #     print(f'{filename} is missing values in the WEEK1 + WEEK2 Total column')
+    # return len(check_original)==len(employee_names)
 
 def main(file_path, directory, df):
+    print_dict = {}
     #takes the first row of the dataframe where the dates and weekdays are
     days_row = df.iloc[0]
     # print(days_row)
@@ -309,7 +311,6 @@ def main(file_path, directory, df):
         except IndexError:
             #HARD PRINT but nothing should be printed
             original = 0
-            print('A value is missing in the week1+week2 total column.')
 
         all_correct, message = compare_list_details(check_computer, sum_minutes,original, employee.name, all_correct)
         if employee.name.lower() == 'Lewis Anthony'.lower():
@@ -326,27 +327,28 @@ def main(file_path, directory, df):
         # print('\n')
 
     status, right_format_file = find_file_with_all_employeees(all_employees_location,directory)
-
     if status and all_correct == len(employees):
         for employee in employees:
             #TEST
             # pass
             right_order = [employee.work_time, employee.overtime_week1, employee.overtime_week2,employee.vacation_hours,employee.sick_hours,employee.holiday_hours]
             len_csv_employees, index = find_employee_index(right_format_file,employee.name)
-            if len_csv_employees == len(employees):
-                # print(f'the index is {index}')
-                fill_get_rename(right_format_file, right_order, index)
+            fill_get_rename(right_format_file, right_order, index)
             # else: 
             #     right_format_file = 'Goldfine Timesheet has an extra employee'
         if len_csv_employees == len(employees):
             move_file(right_format_file)
             move_file(file_path)
+        if len_csv_employees != len(employees):
+            move_file_check(right_format_file)
+            move_file_check(file_path)
 
     #counting if '-' values are there twice, otherwise can fill everything that is correct but not '-'
 
     
     count_dash = 0
     has_neg = False
+    count = 0
     for employee in employees: 
         if '-' in employee.message:
             count_dash += 1
@@ -372,38 +374,45 @@ def main(file_path, directory, df):
         for employee in employees:
             employee.file_message = right_format_file
             directory, filename = os.path.split(file_path)
-            if 'There is one or more' in employee.file_message or 'No file with all' in employee.file_message:
+            if 'There is one or more' in employee.file_message or 'No Goldfine Timesheet with all' in employee.file_message:
+                if filename not in print_dict:
+                    print_dict[filename] = []  # Initialize an empty list for this filename
+                print_dict[filename].append(employee.file_message)  # Append the message
                 #HARD PRINT
-                # print('this is where I am')
-                
-                print(f'File name used: {filename}')
-                # print('employee file message below')
-                # print('this is where I am')
-                print(employee.file_message)
-                print('\n')
+
+                # print(f'\nFile name used: {filename}')
+                # print(employee.file_message)
+                # print('\n')
                 break
-            # elif '-' in (employee.message):
-            #     # print(f'this is the employee message {employee.message}')
-            #     # print(f'this is the end of the employee message')
-            #     # print('One or more of these employees has in-out-in-out format week1+week2 total hours on Excel: \n')
-            #     for employee in employees:
-            #         right_order = [employee.work_time, employee.overtime_week1, employee.overtime_week2,
-            #                        employee.vacation_hours, employee.sick_hours, employee.holiday_hours]
-            #         ignore, index = find_employee_index(right_format_file, employee.name)
-            #         overtime_right_order = fill_get_rename(right_format_file, right_order, index)
-            #         # hard print
-            #         print(f'\nFile name used: {filename}')
-            #         print(employee.message)
-            #         employee.work_time, employee.overtime_week1, employee.vacation_hours= overtime_right_order[0], overtime_right_order[1], overtime_right_order[2]
-            #         employee.sick_hours, employee.holiday_hours = overtime_right_order[2], overtime_right_order[3]
-            #         employee.print_work_hours()
+
             elif 'INCORRECT' in (employee.message):
                 if '-' in (employee.message):
                     pass
                 # hard print
+                if 'Excel sheet shows 0.0' in employee.message:
+                    if filename not in print_dict:
+                        print_dict[filename] = []
+                    print_dict[filename].append("A value is missing in the week1+week2 total column.")
+                    # print(f'\nFile name used: {filename}')
+                    # print("A value is missing in the week1+week2 total column.")
+                    pass
+
                 else: 
-                    print(f'File name used: {filename}')
-                    print(employee.message)
+
+                    if filename not in print_dict:
+                        print_dict[filename] = []
+                    print_dict[filename].append(f'{employee.message}')  # Append the employee message
+                    # print(f'\nFile name used: {filename}')
+                    # print(employee.message)
+
+        for filename, messages in print_dict.items():
+            print(f"\n****************************************")
+            print({filename})
+
+            for message in messages:
+                # Replace '\n' with a newline for clarity in messages
+                formatted_message = message.replace('\\n', '\n')
+                print(formatted_message)  
 
 
                 
@@ -444,41 +453,45 @@ def models(file_path):
         pass
         # main(file_path)
     elif os.path.isdir(file_path):
-        error_occured = False
-        for filename in os.listdir(file_path):
-            # Construct full file path
-            full_path = os.path.join(file_path, filename)
-            directory, x = os.path.split(full_path)
 
-            if filename.lower().endswith('.xls'):
-                #HARD PRINT
-                print('You need to change the format of a file from xls to xlsx.\n')
-                return
-            # Check if it's an Excel file and not a hidden file
-            if filename.startswith('.') or not filename.lower().endswith('.xlsx'):
-                continue
+        #uncomment below ***
+        # error_occured = False
+        # for filename in os.listdir(file_path):
+        #     # Construct full file path
+        #     full_path = os.path.join(file_path, filename)
+        #     directory, x = os.path.split(full_path)
 
-            # Call main with the full file path
-            try:
-                df = read_excel_ignore_hidden(full_path)
+        #     if filename.lower().endswith('.xls'):
+        #         #HARD PRINT
+        #         print('You need to change the format of a file from xls to xlsx.\n')
+        #         return
+        #     # Check if it's an Excel file and not a hidden file
+        #     if filename.startswith('.') or not filename.lower().endswith('.xlsx'):
+        #         continue
 
-            except Exception as e:
-                #HARD PRINT
-                print(f'\nI could not read this file: {full_path}\n')
-                continue
+        #     # Call main with the full file path
+        #     try:
+        #         df = read_excel_ignore_hidden(full_path)
 
-            try:
-                check_passed = error_check(full_path, directory,df)
-                if check_passed == False:
-                    error_occured = True
+        #     except Exception as e:
+        #         #HARD PRINT
+        #         print(f'\nI could not read this file: {full_path}\n')
+        #         continue
 
-            except Exception as e:
-                df = pd.read_excel(full_path)
-                check_passed = error_check(full_path, directory,df)
-                if check_passed == False:
-                    error_occured = True
-        if error_occured: 
-            return
+        #     try:
+        #         check_passed = error_check(full_path, directory,df)
+        #         if check_passed == False:
+        #             error_occured = True
+
+        #     except Exception as e:
+        #         df = pd.read_excel(full_path)
+        #         check_passed = error_check(full_path, directory,df)
+        #         if check_passed == False:
+        #             error_occured = True
+        # if error_occured: 
+        #     return
+        #uncomment below ***
+
         for filename in os.listdir(file_path):
              # Construct full file path
             full_path = os.path.join(file_path, filename)
