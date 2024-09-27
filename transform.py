@@ -100,14 +100,14 @@ def find_file_with_all_employeees(employees,csv_path):
             if use_file:
                 # print(f'this is the right file to use: {full_path}')
                 # print(f'these are all the employees{employees}')
-                if len(employees_from_csv_list)-1 != len(employees):
-                    message = 'There is one or more extra employees in Goldfine Timesheet not in BLS Excel'
-                    return False, message
-                else: 
-                    return True, full_path
-            else:
-                message = 'No file with all the employees was found'
-        return False, message
+                # if len(employees_from_csv_list)-1 != len(employees):
+                #     print('There is one or more extra employees in Goldfine Timesheet not in BLS Excel')
+                #     message = 'There is one or more extra employees in Goldfine Timesheet not in BLS Excel'
+                #     return True, full_path
+                # else: 
+                return True, full_path
+
+        return False, 'No Goldfine Timesheet with all the employees was found'
     else:
         return False, f'The path {csv_path} is not a directory'
         # print(f"The path {csv_path} is not a directory. / no files were found")
