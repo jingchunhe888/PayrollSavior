@@ -101,7 +101,7 @@ def find_file_with_all_employeees(employees,csv_path):
                 # print(f'this is the right file to use: {full_path}')
                 # print(f'these are all the employees{employees}')
                 if len(employees_from_csv_list)-1 != len(employees):
-                    message = 'There is one or more extra employees in Goldfine Timesheet'
+                    message = 'There is one or more extra employees in Goldfine Timesheet not in BLS Excel'
                     return False, message
                 else: 
                     return True, full_path
