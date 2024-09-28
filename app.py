@@ -37,10 +37,7 @@ def main():
     b. If BLS forgot to add a value to the total column.  
     c. Fill sheet for employees with computation error, but leave computation errors blank.''')
     
-    
     st.write("[View User Guide](https://docs.google.com/document/d/1QMZrcSBi4Cax1r3_MLoRC-QLfkkZThgMhR2kpejT_5U/edit?usp=sharing)")
-
-
 
     with st.expander("View All Previous Release Notes"):
         st.markdown('''  
@@ -66,8 +63,11 @@ def main():
     if uploaded_files:
         st.write(f"Uploaded {len(uploaded_files)} files")
 
-        # Create a summary and process the files when the button is clicked
+        # Check if the "Summary" button is clicked
         if st.button("Summary"):
+            # Clear previous summary if it exists
+            st.session_state['summary'] = ""
+            
             old_stdout = sys.stdout
             new_stdout = io.StringIO()
             sys.stdout = new_stdout
@@ -78,35 +78,36 @@ def main():
 
                 # Process the files using the models function (adjust to your logic)
                 models('temp')  # Assumes this function processes files in the 'temp' directory
-                
-                # After processing, delete the temp directory (commented out for now)
-                # delete_temp_dir()  # Avoid deleting temp too early
             finally:
                 sys.stdout = old_stdout
 
-            if new_stdout.getvalue():
-                st.text_area("Summary", new_stdout.getvalue(), height=400)
+            # Store the summary output in session state
+            st.session_state['summary'] = new_stdout.getvalue()
 
-            # Create a ZIP file with the processed files
-            zip_buffer = io.BytesIO()
-            with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
-                for root, _, files in os.walk('temp'):
-                    for file in files:
-                        file_path = os.path.join(root, file)
-                        zipf.write(file_path, os.path.relpath(file_path, start='temp'))
+        # Display the summary output if available
+        if 'summary' in st.session_state and st.session_state['summary']:
+            st.text_area("Summary", st.session_state['summary'], height=400)
 
-            zip_buffer.seek(0)
+        # Create a ZIP file with the processed files
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
+            for root, _, files in os.walk('temp'):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    zipf.write(file_path, os.path.relpath(file_path, start='temp'))
 
-            # Provide a download button for the ZIP file
-            st.download_button(
-                label="Download Filled Files",
-                data=zip_buffer,
-                file_name="BLS Payroll Results.zip",
-                mime="application/zip"
-            )
+        zip_buffer.seek(0)
 
-            # Optionally delete temp directory after download
-            delete_temp_dir()
+        # Provide a download button for the ZIP file
+        st.download_button(
+            label="Download Filled Files",
+            data=zip_buffer,
+            file_name="BLS Payroll Results.zip",
+            mime="application/zip"
+        )
+
+        # Optionally delete temp directory after download
+        delete_temp_dir()
 
 if __name__ == "__main__":
     main()
