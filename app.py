@@ -28,11 +28,15 @@ def delete_temp_dir(temp_dir="temp"):
 
 # Main function for the Streamlit app
 def main():
-    st.title("Payroll Savior 1.4")
+    st.title("Payroll Savior v1.4")
     
     st.markdown('''v1.4 Release Notes:  
-    1. Organized output box for each file.
-    2. 'To Review' download folder for in-out-in-out formats AND if there is an extra employee in Goldfine Timesheet.''')
+    1. Output Box: Prints all errors based on file order.  
+    2. Error checking folders:  
+    a. If BLS has added or removed an employee.  
+    b. f BLS forgot to add a value to the total column. 
+    c. Fill sheet for employees with computation error, but leave computation errors blank.''')
+    
     
     st.write("[View User Guide](https://docs.google.com/document/d/1QMZrcSBi4Cax1r3_MLoRC-QLfkkZThgMhR2kpejT_5U/edit?usp=sharing)")
 
