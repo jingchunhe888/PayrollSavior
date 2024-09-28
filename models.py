@@ -189,7 +189,7 @@ def get_total_hours(df,columns):
         return None  # or an appropriate message, if index out of bounds
     return check
 
-def compare_list_details(list1, sum_minutes, list2, employee,all_correct):
+def compare_list_details(list1, sum_minutes, list2, employee,all_correct,incorrect):
     #it is timedelta
     if isinstance(list2,datetime.timedelta):
         parts = list2.total_seconds()/60
@@ -207,17 +207,19 @@ def compare_list_details(list1, sum_minutes, list2, employee,all_correct):
         print(r'I can\'t figure out the week1+week2 total from Excel')
     # print(f'the sum minutes = {sum_minutes} and the list2 {list2} and the parts {parts} and the hours = {hours} and the minutes = {minutes}')
     if sum_minutes != parts:
+        incorrect.append(employee)
         if isinstance(list2, datetime.timedelta):
             message = f"{employee} INCORRECT\nHH:MM value is {list1} but Excel sheet shows {parts}.\n"
         elif isinstance(list2, int | float):
             message = f"{employee} INCORRECT\nHH:MM value is {list1} but Excel sheet shows {list2}.\n"
         else:
             message = f"{employee} INCORRECT\nHH:MM value is {list1} but Excel sheet shows {list2}.\n"
+
         # print(f"{employee} INCORRECT\nHH:MM value is {list1} but Excel sheet shows {list2}.")
     else:
         message = f"{employee} CORRECT"
         all_correct = all_correct + 1
-    return all_correct,message
+    return all_correct,message, incorrect
 
 def error_check(file_path, directory, df):
     return True
@@ -281,7 +283,9 @@ def main(file_path, directory, df):
 
     all_employees_location = []
     all_correct = 0
+    incorrect = []
     for index, employee in enumerate(employees):
+        missing_total = False
         df_sub = get_employee_df(df, employee.name)
         vacation_count = count_vacation_occurrences(df_sub)
         absent = count_absent_occurrences(df_sub)
@@ -311,8 +315,10 @@ def main(file_path, directory, df):
         except IndexError:
             #HARD PRINT but nothing should be printed
             original = 0
+            missing_total = True
 
-        all_correct, message = compare_list_details(check_computer, sum_minutes,original, employee.name, all_correct)
+
+        all_correct, message,incorrect = compare_list_details(check_computer, sum_minutes,original, employee.name, all_correct,incorrect)
         if employee.name.lower() == 'Lewis Anthony'.lower():
             all_employees_location.append('Luis Anthony')
         else:
@@ -327,50 +333,63 @@ def main(file_path, directory, df):
         # print('\n')
 
     status, right_format_file = find_file_with_all_employeees(all_employees_location,directory)
-    if status and all_correct == len(employees):
+    move_check = ''
+    if status and all_correct + len(incorrect) == len(employees):
         for employee in employees:
+            if missing_total == True:
+                move_check = 'Total Column has Missing Values'
+            elif employee.name in incorrect:
+                move_check = 'Savior and BLS Computed Different Values'
+
+            else:
             #TEST
             # pass
-            right_order = [employee.work_time, employee.overtime_week1, employee.overtime_week2,employee.vacation_hours,employee.sick_hours,employee.holiday_hours]
-            len_csv_employees, index = find_employee_index(right_format_file,employee.name)
-            fill_get_rename(right_format_file, right_order, index)
+                right_order = [employee.work_time, employee.overtime_week1, employee.overtime_week2,employee.vacation_hours,employee.sick_hours,employee.holiday_hours]
+                len_csv_employees, index = find_employee_index(right_format_file,employee.name)
+                fill_get_rename(right_format_file, right_order, index)
             # else: 
             #     right_format_file = 'Goldfine Timesheet has an extra employee'
-        if len_csv_employees == len(employees):
+        if move_check != '': 
+            move_file_check(right_format_file,move_check)
+            move_file_check(file_path,move_check)
+
+        elif len_csv_employees == len(employees):
             move_file(right_format_file)
             move_file(file_path)
-        if len_csv_employees != len(employees):
-            move_file_check(right_format_file)
-            move_file_check(file_path)
+        elif len_csv_employees != len(employees):
+            move_file_check(right_format_file,'BLS has new employee or fired someone')
+            move_file_check(file_path,'BLS has new employee or fired someone')
+
+
 
     #counting if '-' values are there twice, otherwise can fill everything that is correct but not '-'
 
     
-    count_dash = 0
-    has_neg = False
-    count = 0
-    for employee in employees: 
-        if '-' in employee.message:
-            count_dash += 1
-            has_neg = True
-    if status and all_correct+count_dash == len(employees) and has_neg == True:
-        for employee in employees:
-            #TEST
-            # pass
-            right_order = [employee.work_time, employee.overtime_week1, employee.overtime_week2,employee.vacation_hours,employee.sick_hours,employee.holiday_hours]
-            len_csv_employees, index = find_employee_index(right_format_file,employee.name)
-            if len_csv_employees == len(employees):
-                # print(f'the index is {index}')
-                fill_get_rename(right_format_file, right_order, index)
-            # else: 
-            #     right_format_file = 'Goldfine Timesheet has an extra employee'
-        if len_csv_employees == len(employees):
-            move_file_check(right_format_file)
-            move_file_check(file_path)
+    # count_dash = 0
+    # has_neg = False
+    # count = 0
+    # for employee in employees: 
+    #     if '-' in employee.message:
+    #         count_dash += 1
+    #         has_neg = True
+    # if status and all_correct+count_dash == len(employees) and has_neg == True:
+    #     for employee in employees:
+    #         #TEST
+    #         # pass
+    #         right_order = [employee.work_time, employee.overtime_week1, employee.overtime_week2,employee.vacation_hours,employee.sick_hours,employee.holiday_hours]
+    #         len_csv_employees, index = find_employee_index(right_format_file,employee.name)
+    #         if len_csv_employees == len(employees):
+    #             # print(f'the index is {index}')
+    #             fill_get_rename(right_format_file, right_order, index)
+    #         # else: 
+    #         #     right_format_file = 'Goldfine Timesheet has an extra employee'
+    #     if len_csv_employees == len(employees):
+    #         move_file_check(right_format_file)
+    #         move_file_check(file_path)
     
 
     #this is where I am printing the errors
-    else:
+    if not status or all_correct != len(employees):
         for employee in employees:
             employee.file_message = right_format_file
             directory, filename = os.path.split(file_path)
@@ -384,7 +403,7 @@ def main(file_path, directory, df):
                 # print(employee.file_message)
                 # print('\n')
                 break
-
+                
             elif 'INCORRECT' in (employee.message):
                 if '-' in (employee.message):
                     pass
@@ -395,8 +414,6 @@ def main(file_path, directory, df):
                     print_dict[filename].append("A value is missing in the week1+week2 total column.")
                     # print(f'\nFile name used: {filename}')
                     # print("A value is missing in the week1+week2 total column.")
-                    break
-
                 else: 
 
                     if filename not in print_dict:
@@ -406,17 +423,19 @@ def main(file_path, directory, df):
                     # print(employee.message)
 
         for filename, messages in print_dict.items():
-            print(f"\n****************************************")
+            
+            print(f"\n*******************************************")
+            missing_value = 'A value is missing in the week1+week2 total column.'
             print({filename})
-
-            for message in messages:
-                # Replace '\n' with a newline for clarity in messages
-                formatted_message = message.replace('\\n', '\n')
-                print(formatted_message)  
-
-
-                
-
+            
+            # Check if the 'week1+week2' total message exists in the list
+            if missing_value in messages:
+                print(missing_value)
+            else:
+                for message in messages:
+                    # Replace '\n' with a newline for clarity in messages
+                    formatted_message = message.replace('\\n', '\n')
+                    print(formatted_message)
 
 def models(file_path):
     do_your_thing(file_path)
@@ -521,9 +540,3 @@ def models(file_path):
 
 def do_your_thing(csv_path):
     rename_all(csv_path)
-
-#To check code;
-file_path = '/Users/jinhe/Downloads/Test'
-models(file_path)
-
-# do_your_thing(csv_path)
