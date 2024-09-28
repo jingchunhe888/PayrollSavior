@@ -60,13 +60,23 @@ def main():
         accept_multiple_files=True
     )
 
+    # Reset summary and download button if the number of uploaded files changes
+    if 'file_count' not in st.session_state:
+        st.session_state.file_count = 0
+
+    if uploaded_files and len(uploaded_files) != st.session_state.file_count:
+        st.session_state.file_count = len(uploaded_files)
+        st.session_state.summary = ""
+        st.session_state.show_download = False
+
     if uploaded_files:
         st.write(f"Uploaded {len(uploaded_files)} files")
 
         # Check if the "Summary" button is clicked
         if st.button("Summary"):
-            # Clear previous summary if it exists
+            # Clear previous summary
             st.session_state['summary'] = ""
+            st.session_state.show_download = False
             
             old_stdout = sys.stdout
             new_stdout = io.StringIO()
@@ -83,28 +93,31 @@ def main():
 
             # Store the summary output in session state
             st.session_state['summary'] = new_stdout.getvalue()
+            st.session_state.show_download = True  # Enable download button after summary
 
         # Display the summary output if available
         if 'summary' in st.session_state and st.session_state['summary']:
             st.text_area("Summary", st.session_state['summary'], height=400)
 
-        # Create a ZIP file with the processed files
-        zip_buffer = io.BytesIO()
-        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
-            for root, _, files in os.walk('temp'):
-                for file in files:
-                    file_path = os.path.join(root, file)
-                    zipf.write(file_path, os.path.relpath(file_path, start='temp'))
+        # Show download button only after summary is generated
+        if 'show_download' in st.session_state and st.session_state.show_download:
+            # Create a ZIP file with the processed files
+            zip_buffer = io.BytesIO()
+            with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
+                for root, _, files in os.walk('temp'):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        zipf.write(file_path, os.path.relpath(file_path, start='temp'))
 
-        zip_buffer.seek(0)
+            zip_buffer.seek(0)
 
-        # Provide a download button for the ZIP file
-        st.download_button(
-            label="Download Filled Files",
-            data=zip_buffer,
-            file_name="BLS Payroll Results.zip",
-            mime="application/zip"
-        )
+            # Provide a download button for the ZIP file
+            st.download_button(
+                label="Download Filled Files",
+                data=zip_buffer,
+                file_name="BLS Payroll Results.zip",
+                mime="application/zip"
+            )
 
         # Optionally delete temp directory after download
         delete_temp_dir()
