@@ -63,9 +63,9 @@ def move_file(right_format_file):
     shutil.move(right_format_file, destination)
     # print(f'File moved to {dest}')
 
-def move_file_check(right_format_file):
+def move_file_check(right_format_file,folder_name):
     directory, filename = os.path.split(right_format_file)
-    destination = os.path.join(directory, 'To Review')
+    destination = os.path.join(directory, folder_name)
     # Construct the full destination path for the file
 
     # Move the file
