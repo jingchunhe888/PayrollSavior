@@ -34,7 +34,7 @@ def main():
     1. Output Box: Prints all errors based on file order.  
     2. Error checking folders:  
     a. If BLS has added or removed an employee.  
-    b. f BLS forgot to add a value to the total column. 
+    b. f BLS forgot to add a value to the total column.  
     c. Fill sheet for employees with computation error, but leave computation errors blank.''')
     
     
