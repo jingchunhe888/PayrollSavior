@@ -403,15 +403,16 @@ def main(file_path, directory, df):
                 # print(employee.file_message)
                 # print('\n')
                 break
-                
             elif 'INCORRECT' in (employee.message):
                 if '-' in (employee.message):
                     pass
                 # hard print
                 if 'Excel sheet shows 0.0' in employee.message:
-                    if filename not in print_dict:
-                        print_dict[filename] = []
-                    print_dict[filename].append("A value is missing in the week1+week2 total column.")
+                    pass
+                    # if filename not in print_dict:
+                    #     print_dict[filename] = []
+                    # print_dict[filename].append("A value is missing in the week1+week2 total column.")
+
                     # print(f'\nFile name used: {filename}')
                     # print("A value is missing in the week1+week2 total column.")
                 else: 
