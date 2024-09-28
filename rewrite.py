@@ -52,31 +52,42 @@ def fill_get_rename(right_format_file, right_order, index):
 def move_file(right_format_file):
     directory, filename = os.path.split(right_format_file)
     destination = os.path.join(directory, 'Filled')
-    # Construct the full destination path for the file
 
-    # Move the file
-
-# Create the destination directory if it doesn't exist
+    # Create the destination directory if it doesn't exist
     if not os.path.exists(destination):
         os.makedirs(destination)
-# Move the file
-    shutil.move(right_format_file, destination)
-    # print(f'File moved to {dest}')
 
-def move_file_check(right_format_file,folder_name):
+    # Full destination path including the filename
+    destination_file = os.path.join(destination, filename)
+
+    # Check if the file already exists at the destination
+    if os.path.exists(destination_file):
+        os.remove(destination_file)  # Remove the existing file if it exists
+        print(f"Removed existing file: {destination_file}")
+    
+    # Move the file to the destination folder
+    shutil.move(right_format_file, destination)
+    # print(f"Moved file to: {destination}")
+
+def move_file_check(right_format_file, folder_name):
     directory, filename = os.path.split(right_format_file)
     destination = os.path.join(directory, folder_name)
-    # Construct the full destination path for the file
 
-    # Move the file
-
-# Create the destination directory if it doesn't exist
+    # Create the destination directory if it doesn't exist
     if not os.path.exists(destination):
         os.makedirs(destination)
-# Move the file
-    shutil.move(right_format_file, destination)
-    # print(f'File moved to {dest}')
 
+    # Full destination path including the filename
+    destination_file = os.path.join(destination, filename)
+
+    # Check if the file already exists at the destination
+    if os.path.exists(destination_file):
+        os.remove(destination_file)  # Remove the existing file if it exists
+        print(f"Removed existing file: {destination_file}")
+
+    # Move the file to the destination folder
+    shutil.move(right_format_file, destination)
+    # print(f"Moved file to: {destination}")
 
 
 
