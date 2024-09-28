@@ -33,7 +33,6 @@ def reset_uploaded_files():
     st.session_state.show_download = False
     st.session_state.uploaded_files = []  # Clear uploaded files list
     delete_temp_dir()  # Delete temp directory with uploaded files
-    st.experimental_rerun()  # Rerun to update the UI
 
 # Main function for the Streamlit app
 def main():
