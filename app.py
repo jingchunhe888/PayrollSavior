@@ -26,14 +26,6 @@ def delete_temp_dir(temp_dir="temp"):
     if os.path.exists(temp_dir):
         shutil.rmtree(temp_dir)
 
-# Function to reset uploaded files and clear session state
-def reset_uploaded_files():
-    st.session_state.file_count = 0
-    st.session_state.summary = ""
-    st.session_state.show_download = False
-    st.session_state.uploaded_files = []  # Clear uploaded files list
-    delete_temp_dir()  # Delete temp directory with uploaded files
-
 # Main function for the Streamlit app
 def main():
     st.title("Payroll Savior v1.4")
@@ -61,37 +53,24 @@ def main():
         1. Handles wrong weekday headings for overtime computation.
         ''')
 
-    # Initialize session state for file uploads if not already done
-    if 'uploaded_files' not in st.session_state:
-        st.session_state.uploaded_files = []
-
     # Upload multiple files
     uploaded_files = st.file_uploader(
         "Upload BLS Excel and Goldfine Timesheet CSV Files:",
         type=["csv", "xlsx"],
-        accept_multiple_files=True,
-        key="file_uploader"
+        accept_multiple_files=True
     )
-
-    # Store uploaded files in session state
-    if uploaded_files:
-        st.session_state.uploaded_files = uploaded_files
-
-    # Display reset button to delete uploaded files
-    if st.button("Reset Uploaded Files"):
-        reset_uploaded_files()  # Call the reset function
 
     # Reset summary and download button if the number of uploaded files changes
     if 'file_count' not in st.session_state:
         st.session_state.file_count = 0
 
-    if st.session_state.uploaded_files and len(st.session_state.uploaded_files) != st.session_state.file_count:
-        st.session_state.file_count = len(st.session_state.uploaded_files)
+    if uploaded_files and len(uploaded_files) != st.session_state.file_count:
+        st.session_state.file_count = len(uploaded_files)
         st.session_state.summary = ""
         st.session_state.show_download = False
 
-    if st.session_state.uploaded_files:
-        st.write(f"Uploaded {len(st.session_state.uploaded_files)} files")
+    if uploaded_files:
+        st.write(f"Uploaded {len(uploaded_files)} files")
 
         # Check if the "Summary" button is clicked
         if st.button("Summary"):
@@ -105,7 +84,7 @@ def main():
 
             try:
                 # Save uploaded files to the temp directory
-                file_paths = save_uploaded_files(st.session_state.uploaded_files)
+                file_paths = save_uploaded_files(uploaded_files)
 
                 # Process the files using the models function (adjust to your logic)
                 models('temp')  # Assumes this function processes files in the 'temp' directory
