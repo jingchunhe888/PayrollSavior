@@ -408,7 +408,7 @@ def main(file_path, directory, df):
                     pass
                 # hard print
                 if 'Excel sheet shows 0.0' in employee.message:
-                    pass
+                    break
                     # if filename not in print_dict:
                     #     print_dict[filename] = []
                     # print_dict[filename].append("A value is missing in the week1+week2 total column.")
@@ -426,7 +426,7 @@ def main(file_path, directory, df):
         for filename, messages in print_dict.items():
             
             print(f"\n*******************************************")
-            missing_value = 'A value is missing in the week1+week2 total column.'
+            missing_value = 'Total Column has missing values.'
             print({filename})
             
             # Check if the 'week1+week2' total message exists in the list
