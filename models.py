@@ -337,7 +337,6 @@ def main(file_path, directory, df):
     if status and all_correct + len(incorrect) == len(employees):
         for employee in employees:
             if missing_total == True:
-                right_format_file = 'Excel sheet shows 0'
                 move_check = 'Total Column has Missing Values'
             elif employee.name in incorrect:
                 move_check = 'Savior and BLS Computed Different Values'
@@ -352,6 +351,7 @@ def main(file_path, directory, df):
             #     right_format_file = 'Goldfine Timesheet has an extra employee'
         if move_check != '': 
             move_file_check(right_format_file,move_check)
+            right_format_file = 'Excel sheet shows 0'
             move_file_check(file_path,move_check)
 
         elif len_csv_employees == len(employees):
