@@ -284,6 +284,7 @@ def main(file_path, directory, df):
     all_employees_location = []
     all_correct = 0
     incorrect = []
+    missing = []
     for index, employee in enumerate(employees):
         missing_total = False
         df_sub = get_employee_df(df, employee.name)
@@ -338,6 +339,7 @@ def main(file_path, directory, df):
         for employee in employees:
             if missing_total == True:
                 move_check = 'Total Column has Missing Values'
+                missing.append(right_format_file)
             elif employee.name in incorrect:
                 move_check = 'Savior and BLS Computed Different Values'
 
@@ -351,7 +353,7 @@ def main(file_path, directory, df):
             #     right_format_file = 'Goldfine Timesheet has an extra employee'
         if move_check != '': 
             move_file_check(right_format_file,move_check)
-            right_format_file = 'Excel sheet shows 0'
+            right_format_file = 'Total Column'
             move_file_check(file_path,move_check)
 
         elif len_csv_employees == len(employees):
@@ -408,7 +410,7 @@ def main(file_path, directory, df):
                 if '-' in (employee.message):
                     pass
                 # hard print
-                if 'Excel sheet shows 0' in employee.message:
+                if 'Total Column' in employee.file_message:
                     break
                     # if filename not in print_dict:
                     #     print_dict[filename] = []
