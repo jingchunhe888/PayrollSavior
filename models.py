@@ -391,7 +391,10 @@ def main(file_path, directory, df):
     #this is where I am printing the errors
     if not status or all_correct != len(employees):
         for employee in employees:
-            employee.file_message = right_format_file
+            if 'Excel sheet shows 0' in employee.file_message:
+                pass
+            else:
+                employee.file_message = right_format_file
             directory, filename = os.path.split(file_path)
             if 'There is one or more' in employee.file_message or 'No Goldfine Timesheet with all' in employee.file_message:
                 if filename not in print_dict:
