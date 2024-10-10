@@ -407,7 +407,7 @@ def main(file_path, directory, df):
                 if '-' in (employee.message):
                     pass
                 # hard print
-                if 'Excel sheet shows 0.0' in employee.message:
+                if 'Excel sheet shows 0' in employee.message:
                     break
                     # if filename not in print_dict:
                     #     print_dict[filename] = []
