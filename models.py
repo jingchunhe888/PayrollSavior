@@ -284,7 +284,6 @@ def main(file_path, directory, df):
     all_employees_location = []
     all_correct = 0
     incorrect = []
-    missing = []
     for index, employee in enumerate(employees):
         missing_total = False
         df_sub = get_employee_df(df, employee.name)
@@ -339,7 +338,6 @@ def main(file_path, directory, df):
         for employee in employees:
             if missing_total == True:
                 move_check = 'Total Column has Missing Values'
-                missing.append(right_format_file)
             elif employee.name in incorrect:
                 move_check = 'Savior and BLS Computed Different Values'
 
@@ -353,7 +351,6 @@ def main(file_path, directory, df):
             #     right_format_file = 'Goldfine Timesheet has an extra employee'
         if move_check != '': 
             move_file_check(right_format_file,move_check)
-            right_format_file = 'Total Column'
             move_file_check(file_path,move_check)
 
         elif len_csv_employees == len(employees):
@@ -399,7 +396,7 @@ def main(file_path, directory, df):
             if 'There is one or more' in employee.file_message or 'No Goldfine Timesheet with all' in employee.file_message:
                 if filename not in print_dict:
                     print_dict[filename] = []  # Initialize an empty list for this filename
-                print_dict[filename].append(employee.file_message)  # Append the message
+                print_dict[filename].append('There is no corresponding Goldfine Timesheet')  # Append the message
                 #HARD PRINT
 
                 # print(f'\nFile name used: {filename}')
@@ -408,7 +405,7 @@ def main(file_path, directory, df):
                 break
             elif 'INCORRECT' in (employee.message):
                 if '-' in (employee.message):
-                    pass
+                    continue
                 # hard print
                 if 'Total Column' in employee.file_message:
                     break
@@ -426,16 +423,18 @@ def main(file_path, directory, df):
                     # print(f'\nFile name used: {filename}')
                     # print(employee.message)
 
+        skip_print = []
+        for filename in print_dict:
+            for value in print_dict[filename]: 
+                if 'Excel sheet shows 0.0' in value: 
+                    skip_print.append(filename)
+
         for filename, messages in print_dict.items():
-            
-            print(f"\n*******************************************")
-            missing_value = 'Total Column has missing values.'
-            print({filename})
-            
-            # Check if the 'week1+week2' total message exists in the list
-            if missing_value in messages:
-                print(missing_value)
+            if filename in skip_print:
+                continue
             else:
+                print(f"\n*******************************************")
+                print({filename})
                 for message in messages:
                     # Replace '\n' with a newline for clarity in messages
                     formatted_message = message.replace('\\n', '\n')
@@ -544,3 +543,5 @@ def models(file_path):
 
 def do_your_thing(csv_path):
     rename_all(csv_path)
+
+models("/Users/jinhe/Downloads/Test copy")
