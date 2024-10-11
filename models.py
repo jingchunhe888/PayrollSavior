@@ -211,7 +211,11 @@ def compare_list_details(list1, sum_minutes, list2, employee,all_correct,incorre
         if isinstance(list2, datetime.timedelta):
             message = f"{employee} INCORRECT\nHH:MM value is {list1} but Excel sheet shows {parts}.\n"
         elif isinstance(list2, int | float):
-            message = f"{employee} INCORRECT\nHH:MM value is {list1} but Excel sheet shows {list2}.\n"
+            if list1 < 0:
+                message = f"{employee} INCORRECT\nExcel is put in a format (in-out-in-out) that Savior does not understand.\n"
+
+            else:    
+                message = f"{employee} INCORRECT\nHH:MM value is {list1} but Excel sheet shows {list2}.\n"
         else:
             message = f"{employee} INCORRECT\nHH:MM value is {list1} but Excel sheet shows {list2}.\n"
 
@@ -404,22 +408,22 @@ def main(file_path, directory, df):
                 # print('\n')
                 break
             elif 'INCORRECT' in (employee.message):
-                if '-' in (employee.message):
-                    continue
+                # if '-' in (employee.message):
+                #     continue
                 # hard print
-                if 'Total Column' in employee.file_message:
-                    break
+                # if 'Total Column' in employee.file_message:
+                #     break
                     # if filename not in print_dict:
                     #     print_dict[filename] = []
                     # print_dict[filename].append("A value is missing in the week1+week2 total column.")
 
                     # print(f'\nFile name used: {filename}')
                     # print("A value is missing in the week1+week2 total column.")
-                else: 
+                # else: 
 
-                    if filename not in print_dict:
-                        print_dict[filename] = []
-                    print_dict[filename].append(f'{employee.message}')  # Append the employee message
+                if filename not in print_dict:
+                    print_dict[filename] = []
+                print_dict[filename].append(f'{employee.message}')  # Append the employee message
                     # print(f'\nFile name used: {filename}')
                     # print(employee.message)
 
@@ -543,5 +547,3 @@ def models(file_path):
 
 def do_your_thing(csv_path):
     rename_all(csv_path)
-
-models("/Users/jinhe/Downloads/Test copy")
