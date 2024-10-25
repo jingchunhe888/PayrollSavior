@@ -34,11 +34,22 @@ def fill_get_rename(right_format_file, right_order, index):
     # print(f'this is the right order before {right_order}')
     overtime = check_overtime(right_order[1],right_order[2],reg_hours)
     reg_hours = reg_hours/5/2
+
     right_order[3] = right_order[3] * reg_hours
     right_order[4] = right_order[4] * reg_hours
     right_order[5] = right_order[5] * reg_hours
     right_order[1] = overtime
+
+    try:
+        right_order[0] = float(right_order[0])
+        overtime = float(overtime)
+    except Exception as e:
+        pass
+
     right_order[0] = right_order[0] - overtime
+
+    
+
     del right_order[2]
     # print(f'this is the right order after {right_order}')
 
