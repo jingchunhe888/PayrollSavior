@@ -28,19 +28,23 @@ def delete_temp_dir(temp_dir="temp"):
 
 # Main function for the Streamlit app
 def main():
-    st.title("Payroll Savior v1.4")
+    st.title("Payroll Savior v1.5")
     
-    st.markdown('''v1.4 Release Notes:  
-    1. Output Box: Prints all errors based on file order.  
-    2. Error checking folders:  
-    a. If BLS has added or removed an employee.  
-    b. If BLS forgot to add a value to the total column.  
-    c. Fill sheet for employees with computation error, but leave computation errors blank.''')
+    st.markdown('''v1.5 Release Notes:  
+    1. Right calculation for total work hours and overtime.  
+   ''')
     
     st.write("[View User Guide](https://docs.google.com/document/d/1QMZrcSBi4Cax1r3_MLoRC-QLfkkZThgMhR2kpejT_5U/edit?usp=sharing)")
 
     with st.expander("View All Previous Release Notes"):
         st.markdown('''  
+        **v1.4**  
+        1. Output Box: Prints all errors based on file order.  
+        2. Error checking folders:  
+        a. If BLS has added or removed an employee.  
+        b. If BLS forgot to add a value to the total column.  
+        c. Fill sheet for employees with computation error, but leave computation errors blank.
+                    
         **v1.3**
         1. Checks whether Goldfine Timesheets has more employees than BLS Excel.  
         2. 'To Review' download folder for in-out-in-out formats.
