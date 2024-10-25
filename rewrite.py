@@ -38,6 +38,7 @@ def fill_get_rename(right_format_file, right_order, index):
     right_order[4] = right_order[4] * reg_hours
     right_order[5] = right_order[5] * reg_hours
     right_order[1] = overtime
+    right_order[0] = right_order[0] - overtime
     del right_order[2]
     # print(f'this is the right order after {right_order}')
 
