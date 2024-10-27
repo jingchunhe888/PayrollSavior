@@ -45,6 +45,7 @@ def find_employee_index(right_format_file,employee):
     if best_score > 0:  # Adjust the threshold score as needed
         # Find the index of the best match
         best_index = employees_from_csv_list.index(best_match)
+        # print(f'best match {best_match} employee {employee}')
         return len(employees_from_csv_list)-1,best_index
 
 def get_employees_from_csv(full_path):

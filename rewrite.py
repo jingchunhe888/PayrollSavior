@@ -156,7 +156,14 @@ def get_rename(full_path):
     # print('place' + place)
     return place, date
 
+def find_first_item(items):
+    for item in items:
+        if item is not None:
+            return item
+    return None
+
 def set_workdays(list):
+    first_item = find_first_item(list)
     newlist = []
     mon = 0
     for item in list:
@@ -166,7 +173,7 @@ def set_workdays(list):
             if isinstance(item,str):
                 item = str(item) + '2'
                 item = item.upper()
-        if str(item).upper() == 'MON':
+        if str(item).upper() == first_item:
             mon = mon + 1
             if mon == 2:
                 if isinstance(item, str):

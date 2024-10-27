@@ -11,7 +11,14 @@ from transform import *
 from rewrite import *
 import time
 import sys
-#
+
+corrections = {
+    'Lewis Anthony': 'Luis Anthony',
+    'Adri p': 'POMAR GINES ADRIALYS',
+    'Judy': 'Judith Ocampo',
+    'Gabriel Chetry': 'Gabriel Ruiz'
+}
+
 class Employee:
     def __init__(self, name, work_time=0, holiday_hours=0, absent_hours=0, sick_hours=0, vacation_hours=0, overtime_week1=0,overtime_week2=0, message = '', file_message = ''):
         self.name = name
@@ -190,6 +197,7 @@ def get_total_hours(df,columns):
     return check
 
 def compare_list_details(list1, sum_minutes, list2, employee,all_correct,incorrect):
+    print(type(list2))
     #it is timedelta
     if isinstance(list2,datetime.timedelta):
         parts = list2.total_seconds()/60
@@ -291,7 +299,12 @@ def main(file_path, directory, df):
     # print(check_original)
     df = merge_rows(df)
 
+    def correct_names(list):
+        corrected_names = [corrections.get(name, name) for name in employee_names]
+        return corrected_names
+
     employee_names = extract_employee_names(df)
+    employee_names = correct_names(employee_names)
     # print(len(employee_names))
 
     df = rows_to_keep(employee_names, df)
@@ -309,7 +322,6 @@ def main(file_path, directory, df):
         sick = count_sick_occurrences(df_sub)
 
         df_sub.columns = days_row
-        # print(df_sub.to_string())
         df_work_hours = get_valid_columns(df_sub)
         # print('final df')
         # print(df_work_hours.shape)
@@ -367,9 +379,10 @@ def main(file_path, directory, df):
             else:
             #TEST
             # pass
+                len_csv_employees, index = find_employee_index(right_format_file,employee.name)
                 right_order = [employee.work_time, employee.overtime_week1, employee.overtime_week2,employee.vacation_hours,employee.sick_hours,employee.holiday_hours]
                 fill_get_rename(right_format_file, right_order, index)
-                len_csv_employees, index = find_employee_index(right_format_file,employee.name)
+                # len_csv_employees, index = find_employee_index(right_format_file,employee.name)
 
             # else: 
             #     right_format_file = 'Goldfine Timesheet has an extra employee'
@@ -522,4 +535,4 @@ def models(file_path):
 def do_your_thing(csv_path):
     rename_all(csv_path)
 
-models("/Users/jinhe/Downloads/Errors to be fixed copy")
+# models("/Users/jinhe/Downloads/Errors to be fixed copy")
