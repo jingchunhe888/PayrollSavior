@@ -197,7 +197,7 @@ def get_total_hours(df,columns):
     return check
 
 def compare_list_details(list1, sum_minutes, list2, employee,all_correct,incorrect):
-    print(type(list2))
+    # print(type(list2))
     #it is timedelta
     if isinstance(list2,datetime.timedelta):
         parts = list2.total_seconds()/60
@@ -220,7 +220,7 @@ def compare_list_details(list1, sum_minutes, list2, employee,all_correct,incorre
         parts = int(hours)*60+int(minutes)
         #HARD PRINT but nothing should be printed
     elif isinstance(list2,datetime.time):
-        print(type(list2))
+        # print(type(list2))
         parts = list2.minute+list2.hour*60
 
     else: 
@@ -358,7 +358,7 @@ def main(file_path, directory, df):
         else:
             all_employees_location.append(employee.name.strip())
 
-        print(all_employees_location)
+        # print(all_employees_location)
         employee.message = message
 
         # write_file():
