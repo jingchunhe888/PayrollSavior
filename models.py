@@ -519,15 +519,11 @@ def models(file_path):
             try:
                 main(full_path, directory,df)
             except Exception as e:
-                df = pd.read_excel(full_path)
-                main(full_path, directory,df)
-            
-                # try:
-                #     df = pd.read_excel(full_path)
-                #     main(full_path, directory,df)
-                # except Exception as e:
-                #     print(f'i am fully skipping {full_path} because error {e}')
-                #     continue
+                try:
+                    df = pd.read_excel(full_path)
+                    main(full_path, directory,df)
+                except Exception as e:
+                    continue
         #HARD PRINT
         print('Whew I am done running <3')
 
@@ -535,4 +531,4 @@ def models(file_path):
 def do_your_thing(csv_path):
     rename_all(csv_path)
 
-# models("/Users/jinhe/Downloads/Errors to be fixed copy")
+# models('/Users/jinhe/Downloads/11012024- SPAIN')
