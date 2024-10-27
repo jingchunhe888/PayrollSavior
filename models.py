@@ -203,7 +203,7 @@ def compare_list_details(list1, sum_minutes, list2, employee,all_correct,incorre
         minutes = parts[1]
         parts = int(hours)*60+int(minutes)
     elif isinstance(list2, str):
-        list2 = int(list2)
+        list2 = float(list2)
         list2 = f"{list2:.2f}"
         parts = list2.split('.')
         list2 = float(list2)
@@ -211,6 +211,10 @@ def compare_list_details(list1, sum_minutes, list2, employee,all_correct,incorre
         minutes = parts[1]
         parts = int(hours)*60+int(minutes)
         #HARD PRINT but nothing should be printed
+    elif isinstance(list2,datetime.time):
+        print(type(list2))
+        parts = list2.minute+list2.hour*60
+
     else: 
         print(r'I can\'t figure out the week1+week2 total from Excel')
     # print(f'the sum minutes = {sum_minutes} and the list2 {list2} and the parts {parts} and the hours = {hours} and the minutes = {minutes}')
@@ -333,9 +337,16 @@ def main(file_path, directory, df):
         all_correct, message,incorrect = compare_list_details(check_computer, sum_minutes,original, employee.name, all_correct,incorrect)
         if employee.name.lower() == 'Lewis Anthony'.lower():
             all_employees_location.append('Luis Anthony')
+        elif employee.name.lower() == 'Adri p'.lower():
+            all_employees_location.append('POMAR GINES ADRIALYS')
+        elif employee.name.lower() == 'Judy'.lower():
+            all_employees_location.append('Judith Ocampo')
+        elif employee.name.lower() == 'Gabriel Chetry'.lower():
+            all_employees_location.append('Gabriel Ruiz')            
         else:
-            all_employees_location.append(employee.name)
+            all_employees_location.append(employee.name.strip())
 
+        print(all_employees_location)
         employee.message = message
 
         # write_file():
@@ -495,11 +506,15 @@ def models(file_path):
             try:
                 main(full_path, directory,df)
             except Exception as e:
-                try:
-                    df = pd.read_excel(full_path)
-                    main(full_path, directory,df)
-                except Exception as e:
-                    continue
+                df = pd.read_excel(full_path)
+                main(full_path, directory,df)
+            
+                # try:
+                #     df = pd.read_excel(full_path)
+                #     main(full_path, directory,df)
+                # except Exception as e:
+                #     print(f'i am fully skipping {full_path} because error {e}')
+                #     continue
         #HARD PRINT
         print('Whew I am done running <3')
 
@@ -507,4 +522,4 @@ def models(file_path):
 def do_your_thing(csv_path):
     rename_all(csv_path)
 
-# models('/Users/jinhe/Downloads/11012024- SPAIN')
+models("/Users/jinhe/Downloads/Errors to be fixed copy")
