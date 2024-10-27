@@ -202,8 +202,16 @@ def compare_list_details(list1, sum_minutes, list2, employee,all_correct,incorre
         hours = parts[0]
         minutes = parts[1]
         parts = int(hours)*60+int(minutes)
-    else:
+    elif isinstance(list2, str):
+        list2 = int(list2)
+        list2 = f"{list2:.2f}"
+        parts = list2.split('.')
+        list2 = float(list2)
+        hours = parts[0]
+        minutes = parts[1]
+        parts = int(hours)*60+int(minutes)
         #HARD PRINT but nothing should be printed
+    else: 
         print(r'I can\'t figure out the week1+week2 total from Excel')
     # print(f'the sum minutes = {sum_minutes} and the list2 {list2} and the parts {parts} and the hours = {hours} and the minutes = {minutes}')
     if sum_minutes != parts:
@@ -349,10 +357,19 @@ def main(file_path, directory, df):
             #TEST
             # pass
                 right_order = [employee.work_time, employee.overtime_week1, employee.overtime_week2,employee.vacation_hours,employee.sick_hours,employee.holiday_hours]
-                len_csv_employees, index = find_employee_index(right_format_file,employee.name)
                 fill_get_rename(right_format_file, right_order, index)
             # else: 
             #     right_format_file = 'Goldfine Timesheet has an extra employee'
+
+        try:
+            len_csv_employees, index = find_employee_index(right_format_file,employee.name)
+            print('this is length')
+            print(len_csv_employees)
+        except Exception as e:
+            print(f'Something happened {e}')
+            print(file_path)
+            print(right_format_file)
+            print(employee.name)
         if move_check != '': 
             move_file_check(right_format_file,move_check)
             move_file_check(file_path,move_check)
@@ -455,69 +472,15 @@ def models(file_path):
 
     # Check if the current date is past the end date
     if current_date > end_date:
-        # def delete_file(file_path):
-        #     """Delete the file at file_path."""
-        #     try:
-        #         os.remove(file_path)
-        #         #HARD PRINT
-        #         # print(f"{file_path} has been deleted.")
-        #     except Exception as e:
-        #         #HARD PRINT
-                # print(f"Failed to delete {file_path}: {e}")
-        #HARD PRINT
         print(f"This script is no longer allowed to run after the specified date: {end_date}")
-        # print(f"The application will be deleted in 10 seconds")
-        # time.sleep(10)
-        # delete_file(sys.argv[0])
-        return  # Exit the script
+        return  
 
-    # The rest of your script
-    # HARD PRINT
     print(f"Running script... Deadline to renew is: {end_date}\n")
 
     if os.path.isfile(file_path):
         pass
         # main(file_path)
     elif os.path.isdir(file_path):
-
-        #uncomment below ***
-        # error_occured = False
-        # for filename in os.listdir(file_path):
-        #     # Construct full file path
-        #     full_path = os.path.join(file_path, filename)
-        #     directory, x = os.path.split(full_path)
-
-        #     if filename.lower().endswith('.xls'):
-        #         #HARD PRINT
-        #         print('You need to change the format of a file from xls to xlsx.\n')
-        #         return
-        #     # Check if it's an Excel file and not a hidden file
-        #     if filename.startswith('.') or not filename.lower().endswith('.xlsx'):
-        #         continue
-
-        #     # Call main with the full file path
-        #     try:
-        #         df = read_excel_ignore_hidden(full_path)
-
-        #     except Exception as e:
-        #         #HARD PRINT
-        #         print(f'\nI could not read this file: {full_path}\n')
-        #         continue
-
-        #     try:
-        #         check_passed = error_check(full_path, directory,df)
-        #         if check_passed == False:
-        #             error_occured = True
-
-        #     except Exception as e:
-        #         df = pd.read_excel(full_path)
-        #         check_passed = error_check(full_path, directory,df)
-        #         if check_passed == False:
-        #             error_occured = True
-        # if error_occured: 
-        #     return
-        #uncomment below ***
-
         for filename in os.listdir(file_path):
              # Construct full file path
             full_path = os.path.join(file_path, filename)
@@ -548,4 +511,4 @@ def models(file_path):
 def do_your_thing(csv_path):
     rename_all(csv_path)
 
-# models('/Users/jinhe/Downloads/Total Column has Missing Values')
+models('/Users/jinhe/Downloads/11012024- SPAIN')
