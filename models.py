@@ -358,18 +358,11 @@ def main(file_path, directory, df):
             # pass
                 right_order = [employee.work_time, employee.overtime_week1, employee.overtime_week2,employee.vacation_hours,employee.sick_hours,employee.holiday_hours]
                 fill_get_rename(right_format_file, right_order, index)
+                len_csv_employees, index = find_employee_index(right_format_file,employee.name)
+
             # else: 
             #     right_format_file = 'Goldfine Timesheet has an extra employee'
 
-        try:
-            len_csv_employees, index = find_employee_index(right_format_file,employee.name)
-            print('this is length')
-            print(len_csv_employees)
-        except Exception as e:
-            print(f'Something happened {e}')
-            print(file_path)
-            print(right_format_file)
-            print(employee.name)
         if move_check != '': 
             move_file_check(right_format_file,move_check)
             move_file_check(file_path,move_check)
