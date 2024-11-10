@@ -175,8 +175,10 @@ def set_workdays(list):
             pass
         if mon == 2:
             if isinstance(item,str):
-                item = str(item) + '2'
-                item = item.upper()
+                week1 = ['MON', 'TUE', 'TUES', 'WED', 'THU', 'FRI','SAT','SUN']
+                if item in week1:
+                    item = str(item) + '2'
+                    item = item.upper()
         if str(item).upper() == first_item:
             mon = mon + 1
             if mon == 2:

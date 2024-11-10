@@ -532,4 +532,4 @@ def models(file_path):
 def do_your_thing(csv_path):
     rename_all(csv_path)
 
-# models('/Users/jinhe/Downloads/Test11')
+# models('/Users/jinhe/Downloads/DCNY')
