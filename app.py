@@ -32,6 +32,7 @@ def main():
     
     st.markdown('''v1.5 Release Notes:  
     1. Right calculation for total work hours and overtime.  
+    2. Spain NY error
    ''')
     
     st.write("[View User Guide](https://docs.google.com/document/d/1QMZrcSBi4Cax1r3_MLoRC-QLfkkZThgMhR2kpejT_5U/edit?usp=sharing)")
