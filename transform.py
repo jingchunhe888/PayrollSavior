@@ -122,6 +122,7 @@ def create_word_list(employee_to_csv_list):
     #     words = words.strip()
     #     word_list.extend(words)
     word_list = [word.strip().lower() for item in employee_to_csv_list for word in item.split()]
+    # print(word_list)
     return word_list
 
 def check_employees_in_list(employee_to_csv_list, employees):
@@ -131,8 +132,11 @@ def check_employees_in_list(employee_to_csv_list, employees):
     # print(f'this is the word list set {word_list}')
 
     for employee in employees:
+        employee = employee.replace('\'',' ')
+        employee = employee.replace('.',' ')
         # print(f'employee {employee}')
         employee_words = [word.strip() for word in employee.lower().split()]
+        # print(employee_words)
         # print(f'these are the employee words {employee_words}')
         if len(employee_words) > 1:
             # Check if at least one word from multi-word names is in the word_list

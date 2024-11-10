@@ -523,6 +523,7 @@ def models(file_path):
                     df = pd.read_excel(full_path)
                     main(full_path, directory,df)
                 except Exception as e:
+                    # print(f'Could not read file {full_path} and error {e}')
                     continue
         #HARD PRINT
         print('Whew I am done running <3')
@@ -531,4 +532,4 @@ def models(file_path):
 def do_your_thing(csv_path):
     rename_all(csv_path)
 
-# models('/Users/jinhe/Downloads/11012024- SPAIN')
+# models('/Users/jinhe/Downloads/Test11')

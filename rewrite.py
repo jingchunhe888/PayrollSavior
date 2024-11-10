@@ -43,6 +43,7 @@ def fill_get_rename(right_format_file, right_order, index):
     try:
         right_order[0] = float(right_order[0])
         overtime = float(overtime)
+        overtime = round(overtime,2)
     except Exception as e:
         pass
 
@@ -157,13 +158,16 @@ def get_rename(full_path):
     return place, date
 
 def find_first_item(items):
+    week1 = ['MON', 'TUE', 'TUES', 'WED', 'THU', 'FRI','SAT','SUN']
     for item in items:
         if item is not None:
-            return item
+            if item in week1:
+                return item
     return None
 
 def set_workdays(list):
     first_item = find_first_item(list)
+    # print(f'irst_item {first_item}')
     newlist = []
     mon = 0
     for item in list:
