@@ -78,6 +78,16 @@ def get_employee_df(df,employee_name):
 def get_valid_columns(df):
     subset_df = df.iloc[1:4, :]
     subset_df = subset_df.iloc[:, 1:14]
+    #in the future work on blank break values
+    # print(subset_df.iloc[-1])
+    # subset_df.iloc[-1] = '00:00:00'
+    # subset_df.iloc[-1] = pd.to_datetime(subset_df.iloc[-1], format='%H:%M:%S').time()
+    # dtype_df = subset_df.applymap(type)
+    # print('datatypes')
+    # print(dtype_df.to_string())
+    # subset_df 
+    # print("subset_df")
+    # print(subset_df.to_string())
     valid_columns = subset_df.columns[subset_df.notna().all(axis=0)]
     filtered_df = subset_df[valid_columns]
     return filtered_df
@@ -125,6 +135,7 @@ def get_hours(df):
     hours_by_week1 = 0
     hours_by_week2 = 0
     for column_name, column_data in df.items():
+        # print(df.to_string())
         week1 = ['MON', 'TUE', 'TUES', 'WED', 'THU', 'FRI','SAT','SUN']
         week2 = ['MON2', 'TUE2', 'TUES2', 'WED2', 'THU2', 'FRI2','SAT2','SUN2']
         values = []
@@ -155,7 +166,8 @@ def get_hours(df):
     hours_minutes_format = int(sum_minutes / 60)
     hours_minutes_format = f'{hours_minutes_format}.{str(minutes_format).zfill(2)}'
     hours_minutes_format = float(hours_minutes_format)
-
+    # print('total hours by week 1 and week2')
+    # print(total_hours_by_week1,total_hours_by_week2)
     return total_hours, hours_minutes_format, sum_minutes, total_hours_by_week1, total_hours_by_week2
 
 # def pattern():
@@ -523,7 +535,7 @@ def models(file_path):
                     df = pd.read_excel(full_path)
                     main(full_path, directory,df)
                 except Exception as e:
-                    # print(f'Could not read file {full_path} and error {e}')
+                    print(f'ERROR: Skipping this file {full_path}')
                     continue
         #HARD PRINT
         print('Whew I am done running <3')
@@ -532,4 +544,4 @@ def models(file_path):
 def do_your_thing(csv_path):
     rename_all(csv_path)
 
-# models('/Users/jinhe/Downloads/DCNY')
+# models('/Users/jinhe/Downloads/Test123')

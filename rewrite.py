@@ -49,8 +49,6 @@ def fill_get_rename(right_format_file, right_order, index):
 
     right_order[0] = right_order[0] - overtime
 
-    
-
     del right_order[2]
     # print(f'this is the right order after {right_order}')
 
@@ -161,11 +159,14 @@ def find_first_item(items):
     week1 = ['MON', 'TUE', 'TUES', 'WED', 'THU', 'FRI','SAT','SUN']
     for item in items:
         if item is not None:
-            if item in week1:
-                return item
+            if isinstance(item,str):
+                if item.upper() in week1:
+                    return item
     return None
 
 def set_workdays(list):
+    # print(list)
+    # list = [x.upper() for x in list if isinstance(x, str)]
     first_item = find_first_item(list)
     # print(f'irst_item {first_item}')
     newlist = []
@@ -176,7 +177,7 @@ def set_workdays(list):
         if mon == 2:
             if isinstance(item,str):
                 week1 = ['MON', 'TUE', 'TUES', 'WED', 'THU', 'FRI','SAT','SUN']
-                if item in week1:
+                if item.upper() in week1:
                     item = str(item) + '2'
                     item = item.upper()
         if str(item).upper() == first_item:
