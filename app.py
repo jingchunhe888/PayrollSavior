@@ -28,16 +28,19 @@ def delete_temp_dir(temp_dir="temp"):
 
 # Main function for the Streamlit app
 def main():
-    st.title("Payroll Savior v1.5")
+    st.title("Payroll Savior v1.6")
     
-    st.markdown('''v1.5 Release Notes:  
-    1. Overtime Error Fixed 
+    st.markdown('''v1.6 Release Notes:  
+     1. Computes with blank break values.
    ''')
     
     st.write("[View User Guide](https://docs.google.com/document/d/1QMZrcSBi4Cax1r3_MLoRC-QLfkkZThgMhR2kpejT_5U/edit?usp=sharing)")
 
     with st.expander("View All Previous Release Notes"):
         st.markdown('''  
+         **v1.5**  
+        1. Overtime Error Fixed.
+                    
         **v1.4**  
         1. Output Box: Prints all errors based on file order.  
         2. Error checking folders:  
