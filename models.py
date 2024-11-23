@@ -77,7 +77,7 @@ def get_employee_df(df,employee_name):
 
 def get_valid_columns(df):
     subset_df = df.iloc[1:4, :]
-    subset_df = subset_df.iloc[:, 1:14]
+    subset_df = subset_df.iloc[:, 1:18]
     # in the future work on blank break values
     # print(subset_df.iloc[-1])
     subset_df.iloc[-1] = [
