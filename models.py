@@ -78,17 +78,32 @@ def get_employee_df(df,employee_name):
 def get_valid_columns(df):
     subset_df = df.iloc[1:4, :]
     subset_df = subset_df.iloc[:, 1:14]
-    #in the future work on blank break values
+    # in the future work on blank break values
     # print(subset_df.iloc[-1])
-    # subset_df.iloc[-1] = '00:00:00'
-    # subset_df.iloc[-1] = pd.to_datetime(subset_df.iloc[-1], format='%H:%M:%S').time()
-    # dtype_df = subset_df.applymap(type)
+    subset_df.iloc[-1] = [
+        pd.to_datetime('00:00:00', format='%H:%M:%S').time() if pd.isna(val) and subset_df[col].dtype == object else
+        (0.0 if pd.isna(val) and subset_df[col].dtype == float else val)
+        for col, val in zip(subset_df.columns, subset_df.iloc[-1])
+    ]
+    # subset_df.iloc[-1] = [
+    # pd.to_datetime('00:00:00', format='%H:%M:%S').time() if pd.isna(val) else val
+    # for val in subset_df.iloc[-1]
+    # ]
     # print('datatypes')
     # print(dtype_df.to_string())
     # subset_df 
     # print("subset_df")
     # print(subset_df.to_string())
-    valid_columns = subset_df.columns[subset_df.notna().all(axis=0)]
+    unwanted_values = ["holiday", "sick", "vacation", "absent"]
+    # valid_columns = subset_df.columns[subset_df.notna().all(axis=0)]
+    valid_columns = subset_df.columns[
+        subset_df.notna().all(axis=0) &  # No NaN values
+        ~subset_df.apply(
+            lambda col: col.map(lambda x: str(x).lower() in unwanted_values if pd.notna(x) else False)
+        ).any(axis=0)  # No unwanted values
+    ]
+    # valid_columns = subset_df.columns[subset_df.notna().all(axis=0)]
+    # print(subset_df.to_string())
     filtered_df = subset_df[valid_columns]
     return filtered_df
 
@@ -544,4 +559,4 @@ def models(file_path):
 def do_your_thing(csv_path):
     rename_all(csv_path)
 
-# models('/Users/jinhe/Downloads/Test123')
+models('/Users/jinhe/Downloads/Test123')
