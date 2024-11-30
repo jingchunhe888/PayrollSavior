@@ -28,10 +28,10 @@ def delete_temp_dir(temp_dir="temp"):
 
 # Main function for the Streamlit app
 def main():
-    st.title("Payroll Savior v1.6")
+    st.title("Payroll Savior Reborn")
     
-    st.markdown('''v1.6 Release Notes:  
-     1. Computes with blank break values.
+    st.markdown('''v1.7 Release Notes:  
+     1. Compatible with new Excel Sheets.
    ''')
     
     st.write("[View User Guide](https://docs.google.com/document/d/1QMZrcSBi4Cax1r3_MLoRC-QLfkkZThgMhR2kpejT_5U/edit?usp=sharing)")

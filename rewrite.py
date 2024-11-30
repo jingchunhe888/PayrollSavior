@@ -54,6 +54,7 @@ def fill_get_rename(right_format_file, right_order, index):
     # print(f'this is the right order after {right_order}')
 
     for item in right_order:
+        item = item(round,2)
         modify_cell(data, row,start_column,item)
         write_csv(right_format_file, data)
         data = read_csv(right_format_file)
