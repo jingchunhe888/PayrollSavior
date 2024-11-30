@@ -10,6 +10,8 @@ from config import *
 from transform import *
 from rewrite import *
 import time
+from pandas._libs.tslibs.timedeltas import Timedelta
+
 import sys
 
 corrections = {
@@ -78,13 +80,21 @@ def get_employee_df(df,employee_name):
 def get_valid_columns(df):
     subset_df = df.iloc[1:4, :]
     subset_df = subset_df.iloc[:, 1:18]
+    # print('df_break')
+    # print(subset_df.to_string())
     # in the future work on blank break values
     # print(subset_df.iloc[-1])
-    subset_df.iloc[-1] = [
-        pd.to_datetime('00:00:00', format='%H:%M:%S').time() if pd.isna(val) and subset_df[col].dtype == object else
-        (0.0 if pd.isna(val) and subset_df[col].dtype == float else val)
-        for col, val in zip(subset_df.columns, subset_df.iloc[-1])
-    ]
+    # subset_df.iloc[-1] = [
+    column_indices = list(range(0, 7)) + list(range(8, 15))
+    
+    df_break = subset_df.iloc[2, column_indices]
+    df_break = df_break.fillna( pd.to_datetime('00:00:00', format='%H:%M:%S').time())
+    # print(df_break.to_string())
+    # Assign modified df_break back to subset_df
+    subset_df.iloc[2, column_indices] = df_break
+    # print('after applying')
+    # print(subset_df.to_string())
+
     # subset_df.iloc[-1] = [
     # pd.to_datetime('00:00:00', format='%H:%M:%S').time() if pd.isna(val) else val
     # for val in subset_df.iloc[-1]
@@ -225,9 +235,12 @@ def get_total_hours(df,columns):
 
 def compare_list_details(list1, sum_minutes, list2, employee,all_correct,incorrect):
     # print(type(list2))
+    # print('list2')
+    # print(list2)
     #it is timedelta
-    if isinstance(list2,datetime.timedelta):
+    if type(list2) == Timedelta:
         parts = list2.total_seconds()/60
+        parts = float(parts)
 
     #it is HH.MM
     elif isinstance(list2, int | float):
@@ -253,9 +266,12 @@ def compare_list_details(list1, sum_minutes, list2, employee,all_correct,incorre
     else: 
         print(r'I can\'t figure out the week1+week2 total from Excel')
     # print(f'the sum minutes = {sum_minutes} and the list2 {list2} and the parts {parts} and the hours = {hours} and the minutes = {minutes}')
+
     if sum_minutes != parts:
         incorrect.append(employee)
         if isinstance(list2, datetime.timedelta):
+            parts = parts/60
+            parts = round(parts,2)
             message = f"{employee} INCORRECT\nHH:MM value is {list1} but Excel sheet shows {parts}.\n"
         elif isinstance(list2, int | float):
             if list1 < 0:
@@ -307,6 +323,8 @@ def main(file_path, directory, df):
     days_row = df.iloc[0]
     # print(days_row)
     days_row = days_row.tolist()
+    # print('days rows')
+    # print(days_row)
 
     #make sure that the workdays have MON and MON2 
     days_row = set_workdays(days_row)
@@ -334,6 +352,8 @@ def main(file_path, directory, df):
     employee_names = correct_names(employee_names)
     # print(len(employee_names))
 
+    # print(df.to_string())
+
     df = rows_to_keep(employee_names, df)
     employees = create_employees(employee_names)
 
@@ -352,7 +372,6 @@ def main(file_path, directory, df):
         df_work_hours = get_valid_columns(df_sub)
         # print('final df')
         # print(df_work_hours.shape)
-        # print(df_work_hours.to_string())
         # print('valid df')
         # print(df_work_hours.to_string())
 
@@ -559,4 +578,4 @@ def models(file_path):
 def do_your_thing(csv_path):
     rename_all(csv_path)
 
-# models('/Users/jinhe/Downloads/Test123')
+# models("/Users/jinhe/Downloads/BLS TIME TO BE REBORN/Reborn Test/Savior and BLS Computed Different Values")
